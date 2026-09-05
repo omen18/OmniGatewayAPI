@@ -1,0 +1,30 @@
+services:
+  omni-gateway-api:
+    image: ${OMNI_GATEWAY_IMAGE:-eceasy/omni-gateway-api:latest}
+    pull_policy: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+        COMMIT: ${COMMIT:-none}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+    container_name: omni-gateway-api-cluster
+    environment:
+      HOME_JWT: ${HOME_JWT:-}
+    ports:
+      - "8317:8317"
+    volumes:
+      - ${OMNI_GATEWAY_HOME_PATH:-./home}:/root/.omni-gateway-api
+      - ${OMNI_GATEWAY_LOG_PATH:-./logs}:/OmniGatewayAPI/logs
+      - ${OMNI_GATEWAY_PLUGIN_PATH:-./plugins}:/OmniGatewayAPI/plugins
+    command: >
+      sh -eu -c '
+        if [ -z "$$HOME_JWT" ]; then
+          echo "HOME_JWT is required" >&2
+          exit 1
+        fi
+
+        exec ./OmniGatewayAPI -home-jwt "$$HOME_JWT"
+      '
+    restart: unless-stopped
