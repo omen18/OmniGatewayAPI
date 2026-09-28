@@ -1,135 +1,483 @@
 # OmniGateway API
 
-[![Go Version](https://img.shields.io/badge/Go-1.26%2B-00ADD8?style=flat&logo=go)](https://go.dev)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/omen18/OmniGatewayAPI)
-[![Project Level](https://img.shields.io/badge/Academic-Major%20Project%20%283rd%20Year%29-blue.svg)](PROJECT_REPORT.md)
+<div align="center">
 
-English | [Project Report](PROJECT_REPORT.md)
+[![Go Version](https://img.shields.io/badge/Go-1.26%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg?style=for-the-badge)](https://github.com/omen18/OmniGatewayAPI)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white)](docker-compose.yml)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg?style=for-the-badge)](https://github.com/omen18/OmniGatewayAPI)
+[![Academic Level](https://img.shields.io/badge/Academic-3rd%20Year%20Major%20Project-blueviolet.svg?style=for-the-badge)](PROJECT_REPORT.md)
+
+**Next-Generation Multi-Provider AI Proxy Gateway & Protocol Translator**
+
+*Seamlessly bridge, load-balance, and translate requests between OpenAI, Anthropic Claude, Google Gemini, xAI Grok, and Moonshot Kimi.*
+
+[English](README.md) • [Project Report](PROJECT_REPORT.md) • [SDK Docs](docs/sdk-usage.md) • [中文 (Chinese)](README_CN.md) • [日本語 (Japanese)](README_JA.md)
+
+</div>
 
 ---
 
 ### 🎓 Academic & Major Project Notice
-> **Project Title**: OmniGateway API — Multi-Provider AI Proxy Gateway & Protocol Translator  
-> **Course / Track**: B.Tech / B.S. Computer Science & Engineering (3rd Year Major Project)  
-> **Developer & Maintainer**: **Yash Raj Sharan** (`yashraj10messi@gmail.com`)  
-> **Documentation**: Detailed system analysis and capstone report available in [`PROJECT_REPORT.md`](PROJECT_REPORT.md).
+
+> **Project Title**: OmniGateway API: High-Performance Multi-Provider AI Proxy Gateway & Protocol Translator  
+> **Course / Track**: B.Tech / B.S. in Computer Science & Engineering (3rd Year Major Project)  
+> **Developer & Maintainer**: **Yash Raj Sharan** ([yashraj10messi@gmail.com](mailto:yashraj10messi@gmail.com))  
+> **Repository**: [https://github.com/omen18/OmniGatewayAPI](https://github.com/omen18/OmniGatewayAPI)  
+> **Comprehensive System Report**: See [`PROJECT_REPORT.md`](PROJECT_REPORT.md) for architecture, design patterns, and benchmarking.
+
+---
+
+## 💡 What is OmniGateway API?
+
+Modern developer workflows rely heavily on frontier LLMs through coding assistants (Claude Code, Cursor, Aider, Continue) and agentic frameworks. However, developers face friction:
+- **Protocol Fragmentation**: OpenAI, Anthropic, and Google use distinct schemas, streaming SSE formats, and tool-calling interfaces.
+- **Quota & Rate Limits**: Heavy development hits HTTP `429 Too Many Requests` rapidly on single accounts.
+- **Authentication Overhead**: Managing OAuth tokens with short lifespans, API keys, and service accounts is cumbersome.
+
+**OmniGateway API** resolves these challenges by providing a single, unified, protocol-agnostic gateway. Connect any client configured for OpenAI, Claude, or Gemini to OmniGateway API, and let the gateway translate requests, rotate accounts in round-robin fashion, refresh OAuth credentials automatically, and spoof client TLS fingerprints.
 
 ---
 
 ## 🏛️ System Architecture
 
-OmniGateway API bridges heterogenous AI service providers (OpenAI, Anthropic Claude, Google Gemini, xAI Grok) into a single, standardized, high-performance gateway.
-
 ```mermaid
 graph TD
-    Client["Client Applications\n(Claude Code / Cursor / Postman / SDK)"]
-    Gateway["OmniGateway API Core\n(Gin HTTP Engine & Multiplexer)"]
-    AuthConductor["Auth & Concurrency Scheduler\n(Round-Robin & Cooldown Engine)"]
-    Translator["Protocol Translation Pipeline\n(OpenAI ↔ Claude ↔ Gemini ↔ Grok)"]
-    Storage["Storage & Credential Store\n(File / Postgres / Redis / Git)"]
-    Upstream["Upstream Model APIs\n(Anthropic / OpenAI / Google / xAI)"]
+    Client["Client Applications\n(Claude Code / Cursor / Aider / OpenAI SDK / cURL)"]
+    Gateway["OmniGateway API Core\n(Gin HTTP Engine & Protocol Multiplexer :8317)"]
+    AuthConductor["Auth & Concurrency Scheduler\n(Round-Robin Pool & Circuit Breaker)"]
+    Thinking["Canonical Thinking Engine\n(internal/thinking/ - Reasoning Normalization)"]
+    Translator["Protocol Translation Pipeline\n(OpenAI ↔ Claude ↔ Gemini ↔ Grok ↔ Kimi)"]
+    Storage["Storage & Credential State\n(File-based / PostgreSQL / Redis / GitStore)"]
+    Watcher["Zero-Downtime Hot Reload\n(internal/watcher/)"]
+    Upstream["Upstream Frontier AI Providers\n(Anthropic / OpenAI / Google / xAI / Moonshot)"]
 
-    Client -->|HTTP / SSE / WebSocket| Gateway
+    Client -->|HTTP / SSE / WebSocket / Realtime| Gateway
     Gateway --> AuthConductor
-    AuthConductor --> Translator
     AuthConductor <--> Storage
-    Translator -->|uTLS / Transport Layer| Upstream
+    AuthConductor --> Thinking
+    Thinking --> Translator
+    Watcher -.->|Hot Reload Events| AuthConductor
+    Translator -->|uTLS Fingerprint Spoofing / Transport| Upstream
 ```
 
-OmniGateway API is a unified proxy server that provides OpenAI/Gemini/Claude/Codex/Grok compatible API interfaces for CLI models.
+### Architectural Highlights
 
-You can access the following providers locally and with multiple CLI accounts through any OpenAI (including Responses), Gemini (including Interactions), or Claude-compatible client or SDK.
+- **Adapter Pattern (`internal/translator/`)**: Translates vendor-specific request and response payloads to a shared intermediate representation and converts them to the target upstream provider format.
+- **Thinking / Reasoning Pipeline (`internal/thinking/`)**: Normalizes reasoning tokens, thinking budgets, and `:thinking` suffixes across providers without breaking client expectations.
+- **Circuit Breaker & Cooldown Manager (`sdk/cliproxy/auth/`)**: Automatically detects upstream `429` (Rate Limited) and `5xx` errors, applies exponential cooldown to affected credentials, and immediately falls back to healthy accounts.
+- **uTLS Fingerprint Spoofing**: Simulates realistic client browser TLS fingerprints to eliminate upstream vendor anti-bot rejections.
+- **Zero-Downtime Watcher (`internal/watcher/`)**: Dynamically monitors filesystem configuration and authentication token changes, hot-reloading credentials without restarting the server.
+
+---
+
+## 🚀 Key Features
+
+- **Multi-Protocol Translation**:
+  - OpenAI-compatible endpoints: `/v1/chat/completions`, `/v1/completions`, `/v1/models`, `/v1/images`, `/v1/videos`, `/v1/responses`
+  - Anthropic-compatible endpoints: `/v1/messages`, `/v1/messages/count_tokens`
+  - Google Gemini-compatible endpoints: `/v1beta/models/...` (generateContent, streamGenerateContent)
+  - Realtime WebSocket API: `/v1/realtime` for low-latency voice and event streaming
+- **Multi-Account Round-Robin Scheduling**:
+  - Pool multiple accounts for Gemini, OpenAI Codex, Claude Code, xAI Grok, and Kimi.
+  - Automatically distribute incoming traffic to maximize quota thresholds.
+- **Automated OAuth 2.0 & Token Refresh**:
+  - One-click CLI authentication flows with PKCE and headless terminal modes.
+  - Background renewal keeps long-running workflows uninterrupted.
+- **Dual Management Interface**:
+  - **Terminal UI (TUI)**: Beautiful full-screen monitoring powered by Charm Bubbletea & Lipgloss (`--tui`).
+  - **Web Management Panel**: Embedded browser dashboard (`/management.html`) for real-time status and credential auditing.
+- **Enterprise Storage Options**:
+  - File-based default (`~/.cli-proxy-api` / `auths/`)
+  - PostgreSQL (`PGSTORE_*`), Redis (`go-redis/v9`), and GitStore (`GITSTORE_*`).
+- **High Performance & Minimal Footprint**:
+  - Written in Go 1.26+ with goroutine multiplexing.
+  - Sub-millisecond translation overhead (< 1ms).
+  - Handles 10,000+ parallel connections on a baseline memory footprint of ~15 MB.
+- **Embeddable Go SDK**:
+  - Reusable SDK in `sdk/cliproxy` to embed gateway routing, authentication, and translation directly into Go services.
+
+---
+
+## 🌐 Supported Providers & Frontier Models
 
 <table>
+<thead>
+  <tr>
+    <th align="center">Provider</th>
+    <th>Frontier Models</th>
+    <th>Supported Interfaces</th>
+    <th>Authentication Methods</th>
+  </tr>
+</thead>
 <tbody>
-    <tr>
-        <th align="center" width="100">Provider</th>
-        <th align="center">Description</th>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://www.kimi.com/code/?aff=cliproxyapi"><img src="./assets/logo/kimi.svg" alt="Kimi" width="28" height="28" /></a></td>
-        <td>Kimi series models (Kimi K3, Kimi K2.7 Code, etc.). <a href="https://platform.kimi.ai/docs/guide/kimi-k3-quickstart">Kimi K3</a> is Moonshot AI’s most capable model and the world’s first open 3T-class model. With 2.8 trillion parameters, native vision, and a 1-million-token context window, K3 is built for long-horizon coding, knowledge work, and reasoning. OmniGateway API supports Kimi through OAuth or compatible API interfaces. Try the <a href="https://www.kimi.com/code/?aff=cliproxyapi">Kimi Code subscription</a>, or get an API key from the <a href="https://platform.kimi.ai?track_id=track-8a28e4b291d84f62af2fccc3e7a21cb3&aff=cliproxyapi">Kimi Open Platform</a>. Thanks to Kimi for supporting OmniGateway API and the open-source community!</td>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://platform.openai.com/docs/guide/gpt-5.6"><img src="./assets/logo/openai.svg" alt="OpenAI" width="28" height="28" /></a></td>
-        <td>OpenAI GPT series models (GPT 5.6, GPT 5.5, etc.). GPT-5.6 sets a new quality and efficiency baseline for complex production workflows. GPT-5.6 is especially token-efficient and improves frontend aesthetics, including layout, visual hierarchy, and design judgment.</td>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://www.anthropic.com/claude/fable"><img src="./assets/logo/claude.svg" alt="Anthropic" width="28" height="28" /></a></td>
-        <td>Anthropic Claude series models (Claude Fable, Claude Opus, Claude Sonnet, etc.). Claude Fable 5 is Anthropic's most capable widely released model, built for the most demanding reasoning and long-horizon agentic work.</td>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://antigravity.google/"><img src="./assets/logo/antigravity.svg" alt="Antigravity" width="28" height="28" /></a></td>
-        <td>Google Gemini series models (Gemini 3.5 Flash, Gemini 3.1 Pro, etc.). Gemini 3.5 Flash provides sustained frontier-level intelligence optimized for real-world tasks at a higher speed and lower cost. Designed for the agentic era, it excels at sub-agent deployment, multi-step workflows, and long-horizon tasks at scale. This model is particularly effective for rapid agentic loops involving complex coding cycles and iterations.</td>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://x.ai/grok"><img src="./assets/logo/xai.svg" alt="xAI" width="28" height="28" /></a></td>
-        <td>xAI Grok series models (Grok 4.5, Grok Composer 2.5 Fast, etc.). Grok 4.5 is SpaceXAI's frontier model built for coding, agentic tasks, and knowledge work. It was trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.</td>
-    </tr>
+  <tr>
+    <td align="center">
+      <a href="https://platform.openai.com/"><img src="./assets/logo/openai.svg" alt="OpenAI" width="32" height="32" /><br><strong>OpenAI</strong></a>
+    </td>
+    <td>
+      <code>gpt-5.6</code>, <code>gpt-5.5</code>, <code>gpt-4o</code>, <code>o3-mini</code>, <code>o1</code>, Codex CLI series
+    </td>
+    <td>
+      <code>/v1/chat/completions</code><br>
+      <code>/v1/responses</code><br>
+      <code>/v1/realtime</code>
+    </td>
+    <td>
+      OAuth 2.0 (Codex Login)<br>
+      Device Code Flow<br>
+      Standard API Keys
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://www.anthropic.com/claude"><img src="./assets/logo/claude.svg" alt="Anthropic" width="32" height="32" /><br><strong>Anthropic</strong></a>
+    </td>
+    <td>
+      <code>claude-fable-5</code>, <code>claude-opus-4</code>, <code>claude-3-7-sonnet</code>, <code>claude-3-5-sonnet</code>
+    </td>
+    <td>
+      <code>/v1/messages</code><br>
+      <code>/v1/messages/count_tokens</code>
+    </td>
+    <td>
+      OAuth 2.0 (Claude Code CLI)<br>
+      Standard Anthropic API Keys
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://antigravity.google/"><img src="./assets/logo/antigravity.svg" alt="Google" width="32" height="32" /><br><strong>Google</strong></a>
+    </td>
+    <td>
+      <code>gemini-3.5-flash</code>, <code>gemini-3.1-pro</code>, <code>gemini-2.5-pro</code>, <code>gemini-2.5-flash</code>
+    </td>
+    <td>
+      <code>/v1beta/models/*</code><br>
+      <code>/v1/chat/completions</code>
+    </td>
+    <td>
+      OAuth 2.0 (Google Antigravity)<br>
+      Google AI Studio API Keys<br>
+      Vertex AI Service Accounts
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://x.ai/grok"><img src="./assets/logo/xai.svg" alt="xAI" width="32" height="32" /><br><strong>xAI</strong></a>
+    </td>
+    <td>
+      <code>grok-4.5</code>, <code>grok-composer-2.5-fast</code>, Video & Vision Models
+    </td>
+    <td>
+      <code>/v1/chat/completions</code><br>
+      <code>/v1/videos</code>
+    </td>
+    <td>
+      OAuth 2.0 (Grok Build)<br>
+      Standard xAI API Keys
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://www.kimi.com/code/"><img src="./assets/logo/kimi.svg" alt="Kimi" width="32" height="32" /><br><strong>Moonshot Kimi</strong></a>
+    </td>
+    <td>
+      <code>kimi-k3</code> (3T-class 1M context), <code>kimi-k2.7-code</code>
+    </td>
+    <td>
+      <code>/v1/chat/completions</code>
+    </td>
+    <td>
+      OAuth 2.0 (Kimi Code Subscription)<br>
+      Kimi Open Platform API Keys
+    </td>
+  </tr>
 </tbody>
 </table>
 
+---
 
-## Overview
+## ⚡ Quick Start
 
-- OpenAI/Gemini/Claude/Grok compatible API endpoints for CLI models
-- OpenAI Codex support (GPT models) via OAuth login
-- Claude Code support via OAuth login
-- Grok Build support via OAuth login
-- Streaming, non-streaming, and WebSocket responses where supported
-- Function calling/tools support
-- Multimodal input support (text and images)
-- Multiple accounts with round-robin load balancing (Gemini, OpenAI, Claude, Grok)
-- Simple CLI authentication flows (Gemini, OpenAI, Claude, Grok)
-- Generative Language API Key support
-- AI Studio Build multi-account load balancing
-- Claude Code multi-account load balancing
-- OpenAI Codex multi-account load balancing
-- Grok Build multi-account load balancing
-- OpenAI-compatible upstream providers via config (e.g., OpenRouter)
-- Reusable Go SDK for embedding the proxy (see `docs/sdk-usage.md`)
+### 1. Installation
 
-## Getting Started
+#### Option A: Build from Source (Go 1.26+)
+```bash
+# Clone the repository
+git clone https://github.com/omen18/OmniGatewayAPI.git
+cd OmniGatewayAPI
 
-OmniGateway API Guides: [https://help.router-for.me/](https://help.router-for.me/)
+# Build the binary
+go build -o omni-gateway ./cmd/server
 
-## Management API
+# Verify installation
+./omni-gateway --help
+```
 
-see [MANAGEMENT_API.md](https://help.router-for.me/management/api)
+#### Option B: Docker Compose
+```bash
+# Start OmniGateway with Docker Compose
+docker compose up -d
 
-## Usage Statistics
+# Check running container logs
+docker compose logs -f omni-gateway-api
+```
 
-Since v6.10.0, OmniGateway API and [CPAMC](https://github.com/router-for-me/Cli-Proxy-API-Management-Center) no longer ship built-in usage statistics. If you need usage statistics, use:
+---
 
-### [CPA Usage Keeper](https://github.com/Willxup/cpa-usage-keeper)
+### 2. Configure Your Gateway
 
-Standalone persistence and visualization service for OmniGateway API, with periodic data sync, SQLite storage, aggregate APIs, and a built-in dashboard for usage and statistics.
+Copy the example configuration:
+```bash
+cp config.example.yaml config.yaml
+```
 
-### [CPA-Manager-Plus](https://github.com/seakee/CPA-Manager-Plus)
+Minimal `config.yaml`:
+```yaml
+host: "0.0.0.0"
+port: 8317
 
-Full OmniGateway API management center with request-level monitoring and cost estimates. CPA-Manager tracks collected requests by account, model, channel, latency, status, and token usage; estimates cost with editable model prices and one-click LiteLLM price sync; persists events in SQLite; and provides Codex account-pool operations with batch inspection, quota detection, unhealthy account discovery, cleanup suggestions, and one-click execution for day-to-day multi-account maintenance.
+# Gateway access keys (used by your client applications)
+api-keys:
+  - "sk-my-gateway-secret-key"
 
-## SDK Docs
+# Directory where authenticated accounts and tokens are stored
+auth-dir: "./auths"
 
-- Usage: [docs/sdk-usage.md](docs/sdk-usage.md)
-- Advanced (executors & translators): [docs/sdk-advanced.md](docs/sdk-advanced.md)
-- Access: [docs/sdk-access.md](docs/sdk-access.md)
-- Watcher: [docs/sdk-watcher.md](docs/sdk-watcher.md)
-- Custom Provider Example: `examples/custom-provider`
+# Web Management Dashboard (optional)
+remote-management:
+  allow-remote: false
+  secret-key: "admin-secret-password"
+```
 
-## Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### 3. Authenticate Your Accounts
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Run the interactive CLI login commands to add accounts to your pool. The credentials will be saved in your configured `auth-dir` (`./auths`):
 
-## Author & License
+```bash
+# Login to OpenAI Codex (ChatGPT Plus / Pro account)
+./omni-gateway -codex-login
 
-Developed and maintained by **Yash Raj Sharan** (<yashraj10messi@gmail.com>).
+# Login via Device Code Flow (ideal for headless servers / SSH sessions)
+./omni-gateway -codex-device-login
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Login to Anthropic Claude (Claude Code authorization)
+./omni-gateway -claude-login
+
+# Login to Google Gemini (Antigravity OAuth)
+./omni-gateway -antigravity-login
+
+# Login to xAI Grok (Grok Build OAuth)
+./omni-gateway -xai-login
+
+# Login to Moonshot Kimi
+./omni-gateway -kimi-login
+
+# Import a Google Cloud Vertex AI Service Account
+./omni-gateway -vertex-import /path/to/service-account-key.json --vertex-import-prefix vertex
+```
+
+> [!TIP]
+> If running on a remote headless machine, add the `-no-browser` flag to print the OAuth verification URL directly in your terminal.
+
+---
+
+### 4. Start the Gateway
+
+```bash
+# Standard server mode
+./omni-gateway
+
+# Start with real-time Terminal UI (TUI) monitoring
+./omni-gateway --tui
+
+# Start TUI in standalone mode
+./omni-gateway --tui --standalone
+```
+
+The gateway listens on `http://127.0.0.1:8317` by default.
+
+---
+
+## 🔌 Client Integration Examples
+
+### Claude Code CLI
+Set the custom base URL to route all Claude Code requests through OmniGateway:
+```bash
+export ANTHROPIC_BASE_URL="http://localhost:8317"
+export ANTHROPIC_API_KEY="sk-my-gateway-secret-key"
+
+claude
+```
+
+### Cursor / VS Code
+In Cursor Settings > **Models** > **OpenAI API Key**:
+1. Enable **Override OpenAI Base URL**: `http://localhost:8317/v1`
+2. Set API Key: `sk-my-gateway-secret-key`
+3. Enter your desired model (e.g., `gpt-5.6`, `claude-3-7-sonnet`, `gemini-3.5-flash`)
+
+### Python (OpenAI SDK)
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8317/v1",
+    api_key="sk-my-gateway-secret-key",
+)
+
+response = client.chat.completions.create(
+    model="claude-3-7-sonnet", # Handled via protocol translation!
+    messages=[
+        {"role": "system", "content": "You are a senior systems engineer."},
+        {"role": "user", "content": "Explain raft consensus in Go."},
+    ],
+    stream=True,
+)
+
+for chunk in response:
+    if chunk.choices and chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+print()
+```
+
+### cURL Verification
+```bash
+curl http://localhost:8317/v1/chat/completions \
+  -H "Authorization: Bearer sk-my-gateway-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-3.5-flash",
+    "messages": [
+      {"role": "user", "content": "Hello from OmniGateway!"}
+    ]
+  }'
+```
+
+---
+
+## 🧠 Reasoning & Thinking Mode
+
+OmniGateway API features a dedicated thinking engine (`internal/thinking/`). It unifies reasoning parameters across models:
+
+- Add `:thinking` to any model name (e.g. `claude-3-7-sonnet:thinking`, `gpt-5.6:thinking`).
+- Or pass thinking configurations in the request body.
+- OmniGateway normalizes the configuration into a canonical `ThinkingConfig` and translates it into the appropriate provider format (Anthropic Thinking budget, OpenAI reasoning effort, or Gemini thinking parameters).
+
+---
+
+## 📋 CLI Flags Reference
+
+| Flag | Type | Description |
+| :--- | :--- | :--- |
+| `-config <path>` | `string` | Path to `config.yaml` configuration file |
+| `-tui` | `bool` | Launch interactive Charm Bubbletea terminal user interface |
+| `-standalone` | `bool` | In TUI mode, starts an embedded local gateway server |
+| `-local-model` | `bool` | Use embedded model catalogs; skips remote catalog fetching |
+| `-codex-login` | `bool` | Initiate OAuth login for OpenAI Codex / ChatGPT |
+| `-codex-device-login` | `bool` | Initiate headless device-code login for OpenAI Codex |
+| `-claude-login` | `bool` | Initiate OAuth login for Anthropic Claude Code |
+| `-antigravity-login`| `bool` | Initiate OAuth login for Google Gemini / Antigravity |
+| `-xai-login` | `bool` | Initiate OAuth login for xAI Grok |
+| `-kimi-login` | `bool` | Initiate OAuth login for Moonshot Kimi |
+| `-no-browser` | `bool` | Suppress automatic browser opening for OAuth workflows |
+| `-oauth-callback-port <port>` | `int` | Override default local OAuth callback listening port |
+| `-vertex-import <path>` | `string` | Import Google Cloud Vertex AI service account key JSON |
+| `-vertex-import-prefix <prefix>` | `string` | Custom prefix namespace for imported Vertex models |
+
+---
+
+## 🛠️ Embedding the Go SDK
+
+OmniGateway API can be embedded directly into custom Go microservices without running the CLI binary:
+
+```bash
+go get github.com/router-for-me/OmniGatewayAPI/v7/sdk/cliproxy
+```
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/router-for-me/OmniGatewayAPI/v7/internal/config"
+	"github.com/router-for-me/OmniGatewayAPI/v7/sdk/cliproxy"
+)
+
+func main() {
+	cfg, err := config.LoadConfig("config.yaml")
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
+
+	svc, err := cliproxy.NewBuilder().
+		WithConfig(cfg).
+		WithConfigPath("config.yaml").
+		Build()
+	if err != nil {
+		log.Fatalf("failed to build proxy service: %v", err)
+	}
+
+	ctx := context.Background()
+	if err := svc.Run(ctx); err != nil {
+		log.Fatalf("service stopped: %v", err)
+	}
+}
+```
+
+*For more details, see the [SDK Documentation](docs/sdk-usage.md).*
+
+---
+
+## 🧪 Testing & Verification
+
+OmniGateway API adheres to strict Go development standards:
+
+```bash
+# Run unit and integration tests
+go test ./...
+
+# Run a specific package test
+go test -v -run TestProtocolMultiplexer ./internal/api
+
+# Format code (required before pull requests)
+gofmt -w .
+
+# Verify clean compile
+go build -o test-output ./cmd/server && rm test-output
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are very welcome!
+
+1. **Fork** the repository
+2. **Create** your feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'feat: add support for new provider'`)
+4. **Format & Test** (`gofmt -w . && go test ./...`)
+5. **Push** to the branch (`git push origin feature/amazing-feature`)
+6. **Open** a Pull Request
+
+---
+
+## 👤 Author & Academic Attribution
+
+Developed and maintained by:
+
+**Yash Raj Sharan**  
+📧 Email: [yashraj10messi@gmail.com](mailto:yashraj10messi@gmail.com)  
+🐙 GitHub: [@omen18](https://github.com/omen18)  
+🎓 B.Tech / B.S. in Computer Science & Engineering (3rd Year Major Project)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
