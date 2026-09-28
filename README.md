@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/omen18/OmniGatewayAPI)
 [![Project Level](https://img.shields.io/badge/Academic-Major%20Project%20%283rd%20Year%29-blue.svg)](PROJECT_REPORT.md)
 
-English | [中文](README_CN.md) | [日本語](README_JA.md) | [Project Report](PROJECT_REPORT.md)
+English | [Project Report](PROJECT_REPORT.md)
 
 ---
 
