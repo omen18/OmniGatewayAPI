@@ -41,6 +41,9 @@
 </head>
 <body class="bg-cyber-bg text-slate-100 selection:bg-purple-600 selection:text-white">
 
+  <!-- Top Neon Scroll Progress Bar -->
+  <div id="scrollProgressBar"></div>
+
   <!-- Interactive Quantum Canvas Background -->
   <canvas id="quantum-canvas"></canvas>
 
@@ -274,6 +277,7 @@
               <label class="block text-xs font-medium text-slate-300 mb-1.5">Upstream Model</label>
               <select id="studioModelSelect" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-cyan-400 transition-colors">
                 <option value="gemini-3.8-flash">gemini-3.8-flash (Ultra Fast &bull; 1M Context)</option>
+                <option value="omni-embedded-core">omni-embedded-core (✨ Guaranteed Zero-Fail • Standalone Neural Core)</option>
                 <option value="gemini-2.5-pro">gemini-2.5-pro (Frontier Deep Reasoning)</option>
                 <option value="claude-3-7-sonnet">claude-3-7-sonnet (Hybrid Reasoning)</option>
                 <option value="claude-fable-5">claude-fable-5 (Long-Horizon Agent)</option>
@@ -755,6 +759,11 @@ auth-dir: "./auths"</code></pre>
     </footer>
 
   </div>
+
+  <!-- Floating Back-to-Top Button -->
+  <button id="backToTopBtn" title="Scroll to Top">
+    <i data-lucide="arrow-up" class="w-5 h-5 text-cyan-400"></i>
+  </button>
 
   <!-- Main JavaScript App Logic -->
   <script src="app.js"></script>

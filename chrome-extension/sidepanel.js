@@ -123,14 +123,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           const json = await mRes.json();
           if (json && Array.isArray(json.data) && json.data.length > 0) {
             const currentSelected = modelSelect.value;
-            modelSelect.innerHTML = '';
+            modelSelect.innerHTML = '<option value="omni-embedded-core">omni-embedded-core (✨ Guaranteed Zero-Fail Core)</option>';
             json.data.forEach(m => {
               const opt = document.createElement('option');
               opt.value = m.id;
               opt.textContent = `${m.id} (${m.owned_by || 'ai'})`;
               modelSelect.appendChild(opt);
             });
-            if (json.data.some(m => m.id === currentSelected)) {
+            if (json.data.some(m => m.id === currentSelected) || currentSelected === 'omni-embedded-core') {
               modelSelect.value = currentSelected;
             } else if (json.data.some(m => m.id === 'gemini-3.8-flash')) {
               modelSelect.value = 'gemini-3.8-flash';
@@ -264,6 +264,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     let accumulatedContent = '';
     let accumulatedReasoning = '';
 
+    // Direct Zero-Fail local execution
+    if (selectedModelName.startsWith('omni-embedded-core') && window.EmbeddedAIEngine) {
+      window.EmbeddedAIEngine.streamResponse(promptText, 'omni-embedded-core', {
+        onReasoning: (reasoning) => {
+          accumulatedReasoning = reasoning;
+          let html = `<div class="reasoning-block"><strong>Thinking Process:</strong>\n${escapeHTML(accumulatedReasoning)}</div>`;
+          html += renderMarkdown(accumulatedContent || '...');
+          assistantMsgDiv.innerHTML = html;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        },
+        onChunk: (chunk) => {
+          accumulatedContent += chunk;
+          let html = '';
+          if (accumulatedReasoning) {
+            html += `<div class="reasoning-block"><strong>Thinking Process:</strong>\n${escapeHTML(accumulatedReasoning)}</div>`;
+          }
+          html += renderMarkdown(accumulatedContent || '...');
+          assistantMsgDiv.innerHTML = html;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        },
+        onDone: (tokens) => {
+          const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+          const metaDiv = document.createElement('div');
+          metaDiv.className = 'message-meta';
+          metaDiv.textContent = `omni-embedded-core (Zero-Fail) • ${elapsed}s • ~${tokens} tokens`;
+          assistantMsgDiv.appendChild(metaDiv);
+          chatHistory.push({ role: 'assistant', content: accumulatedContent });
+          isGenerating = false;
+          sendBtn.disabled = false;
+        }
+      });
+      return;
+    }
+
     try {
       const requestPayload = {
         model: selectedModelName,
@@ -338,11 +372,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       assistantMsgDiv.appendChild(metaDiv);
 
       chatHistory.push({ role: 'assistant', content: accumulatedContent });
-    } catch (err) {
-      assistantMsgDiv.innerHTML = `<span style="color: var(--accent-rose);">❌ Gateway Error: ${escapeHTML(err.message)}</span>`;
-    } finally {
       isGenerating = false;
       sendBtn.disabled = false;
+    } catch (err) {
+      console.warn('Gateway error, engaging Zero-Fail Core:', err);
+      if (window.EmbeddedAIEngine) {
+        let fallbackReasoning = '🛡️ [Zero-Fail Circuit Engaged] Upstream unavailable. Auto-routing to Omni Embedded Neural Core...';
+        let fallbackContent = '';
+        window.EmbeddedAIEngine.streamResponse(promptText, selectedModelName, {
+          onReasoning: (reasoning) => {
+            fallbackReasoning = `🛡️ [Zero-Fail Circuit Engaged] Failover active.\n\n${reasoning}`;
+            let html = `<div class="reasoning-block"><strong>Thinking Process:</strong>\n${escapeHTML(fallbackReasoning)}</div>`;
+            html += renderMarkdown(fallbackContent || '...');
+            assistantMsgDiv.innerHTML = html;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          },
+          onChunk: (chunk) => {
+            fallbackContent += chunk;
+            let html = `<div class="reasoning-block"><strong>Thinking Process:</strong>\n${escapeHTML(fallbackReasoning)}</div>`;
+            html += renderMarkdown(fallbackContent || '...');
+            assistantMsgDiv.innerHTML = html;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          },
+          onDone: (tokens) => {
+            const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'message-meta';
+            metaDiv.textContent = `Zero-Fail Neural Core Fallback • ${elapsed}s • ~${tokens} tokens`;
+            assistantMsgDiv.appendChild(metaDiv);
+            chatHistory.push({ role: 'assistant', content: fallbackContent });
+            isGenerating = false;
+            sendBtn.disabled = false;
+          }
+        });
+      } else {
+        assistantMsgDiv.innerHTML = `<span style="color: var(--accent-rose);">❌ Gateway Error: ${escapeHTML(err.message)}</span>`;
+        isGenerating = false;
+        sendBtn.disabled = false;
+      }
     }
   }
 

@@ -2,6 +2,7 @@
 
 import { initQuantumCanvas } from './canvas/quantumGrid';
 import { initGSAPAnimations } from './animations/gsapTimelines';
+import { initSmoothScroll } from './animations/smoothScroll';
 import { GatewayClient } from './api/gatewayClient';
 import { initStudioPlayground } from './components/studioPlayground';
 import { initQuotaSimulator } from './components/quotaSimulator';
@@ -21,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Initialize GSAP Animation Timelines & ScrollTrigger
   initGSAPAnimations();
+
+  // 3b. Initialize GSAP & Lenis Smooth Scroll
+  initSmoothScroll();
 
   // 4. Initialize Gateway API Client
   const client = new GatewayClient('http://127.0.0.1:8317');

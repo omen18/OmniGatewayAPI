@@ -1,330 +1,140 @@
-"use strict";
-(() => {
-  // src/canvas/quantumGrid.ts
-  var Particle = class {
-    x;
-    y;
-    vx;
-    vy;
-    radius;
-    color;
-    alpha;
-    constructor(width, height) {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.65;
-      this.vy = (Math.random() - 0.5) * 0.65;
-      this.radius = Math.random() * 2 + 1;
-      this.color = Math.random() > 0.5 ? "rgba(168, 85, 247, " : "rgba(6, 182, 212, ";
-      this.alpha = Math.random() * 0.4 + 0.2;
-    }
-    update(width, height, mouse) {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < 0 || this.x > width) this.vx *= -1;
-      if (this.y < 0 || this.y > height) this.vy *= -1;
-      if (mouse.x !== null && mouse.y !== null) {
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < mouse.radius) {
-          const force = (mouse.radius - dist) / mouse.radius;
-          this.x -= dx / dist * force * 1.5;
-          this.y -= dy / dist * force * 1.5;
-        }
-      }
-    }
-    draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `${this.color}${this.alpha})`;
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = `${this.color}0.8)`;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-  };
-  function initQuantumCanvas(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-    window.addEventListener("resize", () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
-    const particles = [];
-    const particleCount = Math.min(Math.floor(width * height / 18e3), 75);
-    const mouse = { x: null, y: null, radius: 180 };
-    window.addEventListener("mousemove", (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-    window.addEventListener("mouseleave", () => {
-      mouse.x = null;
-      mouse.y = null;
-    });
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle(width, height));
-    }
-    function render() {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < 130) {
-            const alpha = (1 - dist / 130) * 0.22;
-            ctx.strokeStyle = `rgba(147, 51, 234, ${alpha})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-      particles.forEach((p) => {
-        p.update(width, height, mouse);
-        p.draw(ctx);
-      });
-      requestAnimationFrame(render);
-    }
-    render();
-  }
+"use strict";(()=>{var U=class{x;y;vx;vy;radius;color;alpha;constructor(e,i){this.x=Math.random()*e,this.y=Math.random()*i,this.vx=(Math.random()-.5)*.65,this.vy=(Math.random()-.5)*.65,this.radius=Math.random()*2+1,this.color=Math.random()>.5?"rgba(168, 85, 247, ":"rgba(6, 182, 212, ",this.alpha=Math.random()*.4+.2}update(e,i,n){if(this.x+=this.vx,this.y+=this.vy,(this.x<0||this.x>e)&&(this.vx*=-1),(this.y<0||this.y>i)&&(this.vy*=-1),n.x!==null&&n.y!==null){let o=n.x-this.x,s=n.y-this.y,r=Math.hypot(o,s);if(r<n.radius){let d=(n.radius-r)/n.radius;this.x-=o/r*d*1.5,this.y-=s/r*d*1.5}}}draw(e){e.beginPath(),e.arc(this.x,this.y,this.radius,0,Math.PI*2),e.fillStyle=`${this.color}${this.alpha})`,e.shadowBlur=10,e.shadowColor=`${this.color}0.8)`,e.fill(),e.shadowBlur=0}};function Y(t){let e=document.getElementById(t);if(!e)return;let i=e.getContext("2d");if(!i)return;let n=e.width=window.innerWidth,o=e.height=window.innerHeight;window.addEventListener("resize",()=>{n=e.width=window.innerWidth,o=e.height=window.innerHeight});let s=[],r=Math.min(Math.floor(n*o/18e3),75),d={x:null,y:null,radius:180};window.addEventListener("mousemove",h=>{d.x=h.clientX,d.y=h.clientY}),window.addEventListener("mouseleave",()=>{d.x=null,d.y=null});for(let h=0;h<r;h++)s.push(new U(n,o));function u(){if(i){i.clearRect(0,0,n,o);for(let h=0;h<s.length;h++)for(let c=h+1;c<s.length;c++){let a=s[h].x-s[c].x,l=s[h].y-s[c].y,g=Math.hypot(a,l);if(g<130){let m=(1-g/130)*.22;i.strokeStyle=`rgba(147, 51, 234, ${m})`,i.lineWidth=1,i.beginPath(),i.moveTo(s[h].x,s[h].y),i.lineTo(s[c].x,s[c].y),i.stroke()}}s.forEach(h=>{h.update(n,o,d),h.draw(i)}),requestAnimationFrame(u)}}u()}function K(){if(typeof gsap>"u"){console.warn("GSAP is not loaded globally.");return}let t=document.getElementById("cursorGlow");if(t){let i=gsap.quickTo(t,"x",{duration:.5,ease:"power3"}),n=gsap.quickTo(t,"y",{duration:.5,ease:"power3"});window.addEventListener("mousemove",o=>{i(o.clientX),n(o.clientY)})}gsap.timeline({defaults:{ease:"power3.out",duration:.9}}).from(".hero-reveal",{y:40,opacity:0,stagger:.15}).from("#statLatency, #statConnections, #statRateLimits, #statMemory",{scale:.8,opacity:0,duration:.6,stagger:.1,ease:"back.out(1.7)"},"-=0.4"),typeof ScrollTrigger<"u"&&(gsap.registerPlugin(ScrollTrigger),gsap.utils.toArray("section:not(#hero)").forEach(i=>{gsap.from(i,{scrollTrigger:{trigger:i,start:"top 85%",toggleActions:"play none none none"},y:35,opacity:0,duration:.85,ease:"power2.out"})}))}var X="1.3.27";function Z(t,e,i){return Math.max(t,Math.min(e,i))}function lt(t,e,i){return(1-i)*t+i*e}function ct(t,e,i,n){return lt(t,e,1-Math.exp(-i*n))}function dt(t,e){return(t%e+e)%e}var ht=class{isRunning=!1;value=0;from=0;to=0;currentTime=0;lerp;duration;easing;onUpdate;advance(t){if(!this.isRunning)return;let e=!1;if(this.duration&&this.easing){this.currentTime+=t;let i=Z(0,this.currentTime/this.duration,1);e=i>=1;let n=e?1:this.easing(i);this.value=this.from+(this.to-this.from)*n}else this.lerp?(this.value=ct(this.value,this.to,this.lerp*60,t),Math.round(this.value)===Math.round(this.to)&&(this.value=this.to,e=!0)):(this.value=this.to,e=!0);e&&this.stop(),this.onUpdate?.(this.value,e)}stop(){this.isRunning=!1}fromTo(t,e,{lerp:i,duration:n,easing:o,onStart:s,onUpdate:r}){this.from=this.value=t,this.to=e,this.lerp=i,this.duration=n,this.easing=o,this.currentTime=0,this.isRunning=!0,s?.(),this.onUpdate=r}};function ut(t,e){let i;return function(...n){clearTimeout(i),i=setTimeout(()=>{i=void 0,t.apply(this,n)},e)}}var mt=class{width=0;height=0;scrollHeight=0;scrollWidth=0;debouncedResize;wrapperResizeObserver;contentResizeObserver;constructor(t,e,{autoResize:i=!0,debounce:n=250}={}){this.wrapper=t,this.content=e,i&&(this.debouncedResize=ut(this.resize,n),this.wrapper instanceof Window?window.addEventListener("resize",this.debouncedResize):(this.wrapperResizeObserver=new ResizeObserver(this.debouncedResize),this.wrapperResizeObserver.observe(this.wrapper)),this.contentResizeObserver=new ResizeObserver(this.debouncedResize),this.contentResizeObserver.observe(this.content)),this.resize()}destroy(){this.wrapperResizeObserver?.disconnect(),this.contentResizeObserver?.disconnect(),this.wrapper===window&&this.debouncedResize&&window.removeEventListener("resize",this.debouncedResize)}resize=()=>{this.onWrapperResize(),this.onContentResize()};onWrapperResize=()=>{this.wrapper instanceof Window?(this.width=window.innerWidth,this.height=window.innerHeight):(this.width=this.wrapper.clientWidth,this.height=this.wrapper.clientHeight)};onContentResize=()=>{this.wrapper instanceof Window?(this.scrollHeight=this.content.scrollHeight,this.scrollWidth=this.content.scrollWidth):(this.scrollHeight=this.wrapper.scrollHeight,this.scrollWidth=this.wrapper.scrollWidth)};get limit(){return{x:this.scrollWidth-this.width,y:this.scrollHeight-this.height}}},Q=class{events={};emit(t,...e){let i=this.events[t]||[];for(let n=0,o=i.length;n<o;n++)i[n]?.(...e)}on(t,e){return this.events[t]?this.events[t].push(e):this.events[t]=[e],()=>{this.events[t]=this.events[t]?.filter(i=>e!==i)}}off(t,e){this.events[t]=this.events[t]?.filter(i=>e!==i)}destroy(){this.events={}}},pt=100/6,H={passive:!1};function V(t,e){return t===1?pt:t===2?e:1}var gt=class{touchStart={x:0,y:0};lastDelta={x:0,y:0};window={width:0,height:0};emitter=new Q;constructor(t,e={wheelMultiplier:1,touchMultiplier:1}){this.element=t,this.options=e,window.addEventListener("resize",this.onWindowResize),this.onWindowResize(),this.element.addEventListener("wheel",this.onWheel,H),this.element.addEventListener("touchstart",this.onTouchStart,H),this.element.addEventListener("touchmove",this.onTouchMove,H),this.element.addEventListener("touchend",this.onTouchEnd,H)}on(t,e){return this.emitter.on(t,e)}destroy(){this.emitter.destroy(),window.removeEventListener("resize",this.onWindowResize),this.element.removeEventListener("wheel",this.onWheel,H),this.element.removeEventListener("touchstart",this.onTouchStart,H),this.element.removeEventListener("touchmove",this.onTouchMove,H),this.element.removeEventListener("touchend",this.onTouchEnd,H)}onTouchStart=t=>{let{clientX:e,clientY:i}=t.targetTouches?t.targetTouches[0]:t;this.touchStart.x=e,this.touchStart.y=i,this.lastDelta={x:0,y:0},this.emitter.emit("scroll",{deltaX:0,deltaY:0,event:t})};onTouchMove=t=>{let{clientX:e,clientY:i}=t.targetTouches?t.targetTouches[0]:t,n=-(e-this.touchStart.x)*this.options.touchMultiplier,o=-(i-this.touchStart.y)*this.options.touchMultiplier;this.touchStart.x=e,this.touchStart.y=i,this.lastDelta={x:n,y:o},this.emitter.emit("scroll",{deltaX:n,deltaY:o,event:t})};onTouchEnd=t=>{this.emitter.emit("scroll",{deltaX:this.lastDelta.x,deltaY:this.lastDelta.y,event:t})};onWheel=t=>{let{deltaX:e,deltaY:i,deltaMode:n}=t,o=V(n,this.window.width),s=V(n,this.window.height);e*=o,i*=s,e*=this.options.wheelMultiplier,i*=this.options.wheelMultiplier,this.emitter.emit("scroll",{deltaX:e,deltaY:i,event:t})};onWindowResize=()=>{this.window={width:window.innerWidth,height:window.innerHeight}}},j=t=>Math.min(1,1.001-2**(-10*t)),J=class{_isScrolling=!1;_isStopped=!1;_isLocked=!1;_preventNextNativeScrollEvent=!1;_resetVelocityTimeout=null;_rafId=null;_isDraggingSelection=!1;reducedMotionMediaQuery=window.matchMedia("(prefers-reduced-motion: reduce)");isTouching;isIos;time=0;userData={};lastVelocity=0;velocity=0;direction=0;options;targetScroll;animatedScroll;animate=new ht;emitter=new Q;dimensions;virtualScroll;constructor({wrapper:t=window,content:e=document.documentElement,eventsTarget:i=t,smoothWheel:n=!0,syncTouch:o=!1,syncTouchLerp:s=.075,touchInertiaExponent:r=1.7,duration:d,easing:u,lerp:h=.1,infinite:c=!1,orientation:a="vertical",gestureOrientation:l=a==="horizontal"?"both":"vertical",touchMultiplier:g=1,wheelMultiplier:m=1,autoResize:y=!0,prevent:f,virtualScroll:S,overscroll:v=!0,autoRaf:b=!1,anchors:C=!1,autoToggle:B=!1,allowNestedScroll:T=!1,__experimental__naiveDimensions:L=!1,naiveDimensions:A=L,stopInertiaOnNavigate:D=!1,respectReducedMotion:p=!0}={}){window.lenisVersion=X,window.lenis||(window.lenis={}),window.lenis.version=X,a==="horizontal"&&(window.lenis.horizontal=!0),o===!0&&(window.lenis.touch=!0),this.isIos=/(iPad|iPhone|iPod)/g.test(navigator.userAgent),(!t||t===document.documentElement)&&(t=window),typeof d=="number"&&typeof u!="function"?u=j:typeof u=="function"&&typeof d!="number"&&(d=1),this.options={wrapper:t,content:e,eventsTarget:i,smoothWheel:n,syncTouch:o,syncTouchLerp:s,touchInertiaExponent:r,duration:d,easing:u,lerp:h,infinite:c,gestureOrientation:l,orientation:a,touchMultiplier:g,wheelMultiplier:m,autoResize:y,prevent:f,virtualScroll:S,overscroll:v,autoRaf:b,anchors:C,autoToggle:B,allowNestedScroll:T,naiveDimensions:A,stopInertiaOnNavigate:D,respectReducedMotion:p},this.dimensions=new mt(t,e,{autoResize:y}),this.updateClassName(),this.targetScroll=this.animatedScroll=this.actualScroll,this.options.wrapper.addEventListener("scroll",this.onNativeScroll),this.options.wrapper.addEventListener("scrollend",this.onScrollEnd,{capture:!0}),(this.options.anchors||this.options.stopInertiaOnNavigate)&&this.options.wrapper.addEventListener("click",this.onClick),this.options.wrapper.addEventListener("pointerdown",this.onPointerDown),this.virtualScroll=new gt(i,{touchMultiplier:g,wheelMultiplier:m}),this.virtualScroll.on("scroll",this.onVirtualScroll),this.options.autoToggle&&(this.checkOverflow(),this.rootElement.addEventListener("transitionend",this.onTransitionEnd)),this.options.autoRaf&&(this._rafId=requestAnimationFrame(this.raf))}destroy(){this.emitter.destroy(),this._resetVelocityTimeout!==null&&(clearTimeout(this._resetVelocityTimeout),this._resetVelocityTimeout=null),this.options.wrapper.removeEventListener("scroll",this.onNativeScroll),this.options.wrapper.removeEventListener("scrollend",this.onScrollEnd,{capture:!0}),this.options.wrapper.removeEventListener("pointerdown",this.onPointerDown),(this.options.anchors||this.options.stopInertiaOnNavigate)&&this.options.wrapper.removeEventListener("click",this.onClick),this.virtualScroll.destroy(),this.dimensions.destroy(),this.cleanUpClassName(),this._rafId&&cancelAnimationFrame(this._rafId)}on(t,e){return this.emitter.on(t,e)}off(t,e){return this.emitter.off(t,e)}onScrollEnd=t=>{t instanceof CustomEvent||(this.isScrolling==="smooth"||this.isScrolling===!1)&&t.stopPropagation()};dispatchScrollendEvent=()=>{this.options.wrapper.dispatchEvent(new CustomEvent("scrollend",{bubbles:this.options.wrapper===window,detail:{lenisScrollEnd:!0}}))};get overflow(){let t=this.isHorizontal?"overflow-x":"overflow-y";return getComputedStyle(this.rootElement)[t]}checkOverflow(){["hidden","clip"].includes(this.overflow)?this.internalStop():this.internalStart()}onTransitionEnd=t=>{t.propertyName?.includes("overflow")&&t.target===this.rootElement&&this.checkOverflow()};setScroll(t){this.isHorizontal?this.options.wrapper.scrollTo({left:t,behavior:"instant"}):this.options.wrapper.scrollTo({top:t,behavior:"instant"})}onClick=t=>{let e=t.composedPath().filter(n=>n instanceof HTMLAnchorElement&&n.href).map(n=>new URL(n.href)),i=new URL(window.location.href);if(this.options.anchors){let n=e.find(o=>i.host===o.host&&i.pathname===o.pathname&&o.hash);if(n){let o=typeof this.options.anchors=="object"&&this.options.anchors?this.options.anchors:void 0,s=decodeURIComponent(n.hash);this.scrollTo(s,o);return}}if(this.options.stopInertiaOnNavigate&&e.some(n=>i.host===n.host&&i.pathname!==n.pathname)){this.reset();return}};onPointerDown=t=>{t.button===1&&this.reset()};isTouchOnSelectionHandle(t){let e=window.getSelection();if(!e||e.isCollapsed||e.rangeCount===0)return!1;let i=t.targetTouches[0]??t.changedTouches[0];if(!i)return!1;let n=e.getRangeAt(0).getClientRects();if(n.length===0)return!1;let o=n[0],s=n[n.length-1],r=40,d=Math.hypot(i.clientX-o.left,i.clientY-o.top)<=r,u=Math.hypot(i.clientX-s.right,i.clientY-s.bottom)<=r;return d||u}onVirtualScroll=t=>{if(typeof this.options.virtualScroll=="function"&&this.options.virtualScroll(t)===!1)return;let{deltaX:e,deltaY:i,event:n}=t;if(this.emitter.emit("virtual-scroll",{deltaX:e,deltaY:i,event:n}),n.ctrlKey||n.lenisStopPropagation)return;let o=n.type.includes("touch"),s=n.type.includes("wheel");if(o&&this.isIos&&(n.type==="touchstart"&&(this._isDraggingSelection=this.isTouchOnSelectionHandle(n)),this._isDraggingSelection)){n.type==="touchend"&&(this._isDraggingSelection=!1);return}this.isTouching=n.type==="touchstart"||n.type==="touchmove";let r=e===0&&i===0;if(this.options.syncTouch&&o&&n.type==="touchstart"&&r&&!this.isStopped&&!this.isLocked){this.reset();return}let d=this.options.gestureOrientation==="vertical"&&i===0||this.options.gestureOrientation==="horizontal"&&e===0;if(r||d)return;let u=n.composedPath();u=u.slice(0,u.indexOf(this.rootElement));let h=this.options.prevent,c=Math.abs(e)>=Math.abs(i)?"horizontal":"vertical";if(u.find(m=>m instanceof HTMLElement&&(typeof h=="function"&&h?.(m)||m.hasAttribute?.("data-lenis-prevent")||c==="vertical"&&m.hasAttribute?.("data-lenis-prevent-vertical")||c==="horizontal"&&m.hasAttribute?.("data-lenis-prevent-horizontal")||o&&m.hasAttribute?.("data-lenis-prevent-touch")||s&&m.hasAttribute?.("data-lenis-prevent-wheel")||this.options.allowNestedScroll&&this.hasNestedScroll(m,{deltaX:e,deltaY:i}))))return;if(this.isStopped||this.isLocked){n.cancelable&&n.preventDefault();return}if(!(this.options.syncTouch&&o||this.options.smoothWheel&&s)){this.isScrolling="native",this.animate.stop(),n.lenisStopPropagation=!0;return}let a=i;this.options.gestureOrientation==="both"?a=Math.abs(i)>Math.abs(e)?i:e:this.options.gestureOrientation==="horizontal"&&(a=e),(!this.options.overscroll||this.options.infinite||this.options.wrapper!==window&&this.limit>0&&(this.animatedScroll>0&&this.animatedScroll<this.limit||this.animatedScroll===0&&i>0||this.animatedScroll===this.limit&&i<0))&&(n.lenisStopPropagation=!0),n.cancelable&&n.preventDefault();let l=o&&this.options.syncTouch,g=o&&n.type==="touchend";g&&(a=Math.sign(a)*Math.abs(this.velocity)**this.options.touchInertiaExponent),this.scrollTo(this.targetScroll+a,{programmatic:!1,...l?{lerp:g?this.options.syncTouchLerp:1}:{lerp:this.options.lerp,duration:this.options.duration,easing:this.options.easing}})};resize(){this.dimensions.resize(),this.animatedScroll=this.targetScroll=this.actualScroll,this.emit()}emit(){this.emitter.emit("scroll",this)}onNativeScroll=()=>{if(this._resetVelocityTimeout!==null&&(clearTimeout(this._resetVelocityTimeout),this._resetVelocityTimeout=null),this._preventNextNativeScrollEvent){this._preventNextNativeScrollEvent=!1;return}if(this.isScrolling===!1||this.isScrolling==="native"){let t=this.animatedScroll;this.animatedScroll=this.targetScroll=this.actualScroll,this.lastVelocity=this.velocity,this.velocity=this.animatedScroll-t,this.direction=Math.sign(this.animatedScroll-t),this.isStopped||(this.isScrolling="native"),this.emit(),this.velocity!==0&&(this._resetVelocityTimeout=setTimeout(()=>{this.lastVelocity=this.velocity,this.velocity=0,this.isScrolling=!1,this.emit()},400))}};reset(){this.isLocked=!1,this.isScrolling=!1,this.animatedScroll=this.targetScroll=this.actualScroll,this.lastVelocity=this.velocity=0,this.animate.stop()}start(){if(this.isStopped){if(this.options.autoToggle){this.rootElement.style.removeProperty("overflow");return}this.internalStart()}}internalStart(){this.isStopped&&(this.reset(),this.isStopped=!1,this.emit())}stop(){if(!this.isStopped){if(this.options.autoToggle){this.rootElement.style.setProperty("overflow","clip");return}this.internalStop()}}internalStop(){this.isStopped||(this.reset(),this.isStopped=!0,this.emit())}raf=t=>{let e=t-(this.time||t);this.time=t,this.animate.advance(e*.001),this.options.autoRaf&&(this._rafId=requestAnimationFrame(this.raf))};scrollTo(t,{offset:e=0,immediate:i=!1,lock:n=!1,programmatic:o=!0,lerp:s=o?this.options.lerp:void 0,duration:r=o?this.options.duration:void 0,easing:d=o?this.options.easing:void 0,onStart:u,onComplete:h,force:c=!1,userData:a}={}){if(this.prefersReducedMotion&&(o?i=!0:(s=1,r=void 0,d=void 0)),(this.isStopped||this.isLocked)&&!c)return;let l=t,g=e;if(typeof l=="string"&&["top","left","start","#"].includes(l))l=0;else if(typeof l=="string"&&["bottom","right","end"].includes(l))l=this.limit;else{let m=null;if(typeof l=="string"?(m=l.startsWith("#")?document.getElementById(l.slice(1)):document.querySelector(l),m||(l==="#top"?l=0:console.warn("Lenis: Target not found",l))):l instanceof Element&&(m=l),m){if(this.options.wrapper!==window){let C=this.rootElement.getBoundingClientRect();g-=this.isHorizontal?C.left:C.top}let y=m.getBoundingClientRect(),f=getComputedStyle(m),S=this.isHorizontal?Number.parseFloat(f.scrollMarginLeft):Number.parseFloat(f.scrollMarginTop),v=getComputedStyle(this.rootElement),b=this.isHorizontal?Number.parseFloat(v.scrollPaddingLeft):Number.parseFloat(v.scrollPaddingTop);l=(this.isHorizontal?y.left:y.top)+this.animatedScroll-(Number.isNaN(S)?0:S)-(Number.isNaN(b)?0:b)}}if(typeof l=="number"){if(l+=g,this.options.infinite){if(o){this.targetScroll=this.animatedScroll=this.scroll;let m=l-this.animatedScroll;m>this.limit/2?l-=this.limit:m<-this.limit/2&&(l+=this.limit)}}else l=Z(0,l,this.limit);if(l===this.targetScroll){u?.(this),h?.(this);return}if(this.userData=a??{},i){this.animatedScroll=this.targetScroll=l,this.setScroll(this.scroll),this.reset(),this.preventNextNativeScrollEvent(),this.emit(),h?.(this),this.userData={},requestAnimationFrame(()=>{this.dispatchScrollendEvent()});return}o||(this.targetScroll=l),typeof r=="number"&&typeof d!="function"?d=j:typeof d=="function"&&typeof r!="number"&&(r=1),this.animate.fromTo(this.animatedScroll,l,{duration:r,easing:d,lerp:s,onStart:()=>{n&&(this.isLocked=!0),this.isScrolling="smooth",u?.(this)},onUpdate:(m,y)=>{this.isScrolling="smooth",this.lastVelocity=this.velocity,this.velocity=m-this.animatedScroll,this.direction=Math.sign(this.velocity),this.animatedScroll=m,this.setScroll(this.scroll),o&&(this.targetScroll=m),y||this.emit(),y&&(this.reset(),this.emit(),h?.(this),this.userData={},requestAnimationFrame(()=>{this.dispatchScrollendEvent()}),this.preventNextNativeScrollEvent())}})}}preventNextNativeScrollEvent(){this._preventNextNativeScrollEvent=!0,requestAnimationFrame(()=>{this._preventNextNativeScrollEvent=!1})}hasNestedScroll(t,{deltaX:e,deltaY:i}){let n=Date.now();t._lenis||(t._lenis={});let o=t._lenis,s,r,d,u,h,c,a,l,g,m;if(n-(o.time??0)>2e3){o.time=Date.now();let T=window.getComputedStyle(t);if(o.computedStyle=T,s=["auto","overlay","scroll"].includes(T.overflowX),r=["auto","overlay","scroll"].includes(T.overflowY),h=["auto"].includes(T.overscrollBehaviorX),c=["auto"].includes(T.overscrollBehaviorY),o.hasOverflowX=s,o.hasOverflowY=r,!(s||r))return!1;a=t.scrollWidth,l=t.scrollHeight,g=t.clientWidth,m=t.clientHeight,d=a>g,u=l>m,o.isScrollableX=d,o.isScrollableY=u,o.scrollWidth=a,o.scrollHeight=l,o.clientWidth=g,o.clientHeight=m,o.hasOverscrollBehaviorX=h,o.hasOverscrollBehaviorY=c}else d=o.isScrollableX,u=o.isScrollableY,s=o.hasOverflowX,r=o.hasOverflowY,a=o.scrollWidth,l=o.scrollHeight,g=o.clientWidth,m=o.clientHeight,h=o.hasOverscrollBehaviorX,c=o.hasOverscrollBehaviorY;if(!(s&&d||r&&u))return!1;let y=Math.abs(e)>=Math.abs(i)?"horizontal":"vertical",f,S,v,b,C,B;if(y==="horizontal")f=Math.round(t.scrollLeft),S=a-g,v=e,b=s,C=d,B=h;else if(y==="vertical")f=Math.round(t.scrollTop),S=l-m,v=i,b=r,C=u,B=c;else return!1;return!B&&(f>=S||f<=0)?!0:(v>0?f<S:f>0)&&b&&C}get rootElement(){return this.options.wrapper===window?document.documentElement:this.options.wrapper}get limit(){return this.options.naiveDimensions?this.isHorizontal?this.rootElement.scrollWidth-this.rootElement.clientWidth:this.rootElement.scrollHeight-this.rootElement.clientHeight:this.dimensions.limit[this.isHorizontal?"x":"y"]}get isHorizontal(){return this.options.orientation==="horizontal"}get actualScroll(){let t=this.options.wrapper;return this.isHorizontal?t.scrollX??t.scrollLeft:t.scrollY??t.scrollTop}get scroll(){return this.options.infinite?dt(this.animatedScroll,this.limit):this.animatedScroll}get progress(){return this.limit===0?1:this.scroll/this.limit}get isScrolling(){return this._isScrolling}set isScrolling(t){this._isScrolling!==t&&(this._isScrolling=t,this.updateClassName())}get isStopped(){return this._isStopped}set isStopped(t){this._isStopped!==t&&(this._isStopped=t,this.updateClassName())}get isLocked(){return this._isLocked}set isLocked(t){this._isLocked!==t&&(this._isLocked=t,this.updateClassName())}get isSmooth(){return this.isScrolling==="smooth"}get prefersReducedMotion(){return this.options.respectReducedMotion&&this.reducedMotionMediaQuery.matches}get className(){let t="lenis";return this.options.autoToggle&&(t+=" lenis-autoToggle"),this.isStopped&&(t+=" lenis-stopped"),this.isLocked&&(t+=" lenis-locked"),this.isScrolling&&(t+=" lenis-scrolling"),this.isScrolling==="smooth"&&(t+=" lenis-smooth"),t}updateClassName(){this.cleanUpClassName(),this.className.split(" ").forEach(t=>{this.rootElement.classList.add(t)})}cleanUpClassName(){for(let t of Array.from(this.rootElement.classList))(t==="lenis"||t.startsWith("lenis-"))&&this.rootElement.classList.remove(t)}};function tt(){let t=new J({duration:1.25,easing:n=>Math.min(1,1.001-Math.pow(2,-10*n)),orientation:"vertical",gestureOrientation:"vertical",smoothWheel:!0,wheelMultiplier:1.05,touchMultiplier:2,infinite:!1});t.on("scroll",()=>{typeof ScrollTrigger<"u"&&ScrollTrigger.update()}),typeof gsap<"u"&&(gsap.ticker.add(n=>{t.raf(n*1e3)}),gsap.ticker.lagSmoothing(0)),document.querySelectorAll('a[href^="#"]').forEach(n=>{n.addEventListener("click",o=>{let s=n.getAttribute("href");if(s&&s!=="#"){let r=document.querySelector(s);r&&(o.preventDefault(),t.scrollTo(r,{offset:-85,duration:1.4,easing:d=>Math.min(1,1.001-Math.pow(2,-10*d))}))}})});let e=document.getElementById("scrollProgressBar"),i=document.getElementById("backToTopBtn");return t.on("scroll",n=>{if(e){let o=document.documentElement.scrollHeight-window.innerHeight,s=o>0?n.scroll/o:0;e.style.transform=`scaleX(${Math.min(1,Math.max(0,s))})`}i&&(n.scroll>400?i.classList.add("visible"):i.classList.remove("visible"))}),i&&i.addEventListener("click",()=>{t.scrollTo(0,{duration:1.5})}),typeof gsap<"u"&&typeof ScrollTrigger<"u"&&(gsap.to(".ambient-purple",{y:250,ease:"none",scrollTrigger:{trigger:"body",start:"top top",end:"bottom bottom",scrub:1.5}}),gsap.to(".ambient-cyan",{y:-250,ease:"none",scrollTrigger:{trigger:"body",start:"top top",end:"bottom bottom",scrub:1.5}})),window.lenis=t,t}var _=class{baseUrl;constructor(e="http://127.0.0.1:8317"){this.baseUrl=e.replace(/\/+$/,"")}setBaseUrl(e){this.baseUrl=e.replace(/\/+$/,"")}getBaseUrl(){return this.baseUrl}async checkHealth(){let e=performance.now();try{let i=new AbortController,n=setTimeout(()=>i.abort(),3500),o=await fetch(`${this.baseUrl}/healthz`,{method:"GET",signal:i.signal});clearTimeout(n);let s=Math.round(performance.now()-e);return o.ok?{ok:!0,latencyMs:s,statusText:`Online \u2022 ${s}ms`}:{ok:!1,latencyMs:s,statusText:`HTTP ${o.status}`}}catch{return{ok:!1,latencyMs:0,statusText:"Demo Mode (8317 Standby)"}}}async fetchModels(e){try{let i=await fetch(`${this.baseUrl}/v1/models`,{headers:{Authorization:`Bearer ${e}`}});return i.ok?await i.json():null}catch{return null}}async streamChat(e,i,n){try{let o=await fetch(`${this.baseUrl}/v1/chat/completions`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${i}`},body:JSON.stringify(e)});if(!o.ok){let s=await o.json().catch(()=>({}));throw new Error(s.error?.message||`HTTP ${o.status}`)}if(e.stream&&o.body){let s=o.body.getReader(),r=new TextDecoder("utf-8"),d="",u=0;for(;;){let{done:h,value:c}=await s.read();if(h)break;d+=r.decode(c,{stream:!0});let a=d.split(`
+`);d=a.pop()||"";for(let l of a){let g=l.trim();if(!(!g||!g.startsWith("data: "))){if(g==="data: [DONE]")break;try{let y=JSON.parse(g.slice(6)).choices?.[0]?.delta;y&&(y.reasoning_content&&n.onReasoning(y.reasoning_content),y.content&&(n.onChunk(y.content),u++))}catch{}}}}n.onDone(u)}else{let s=await o.json(),r=s.choices?.[0]?.message?.content||"No response";n.onChunk(r),n.onDone(s.usage?.completion_tokens||50)}}catch(o){n.onError(o instanceof Error?o:new Error(String(o)))}}};var N=class{static generateResponse(e,i="omni-embedded-core"){let n=e.toLowerCase();return n.includes("raft")||n.includes("consensus")?{reasoning:`1. Analyzing distributed consensus requirements.
+2. Formulating Raft state transitions: Leader, Follower, Candidate.
+3. Implementing heartbeat RPCs, election timeouts, and log replication in Go.
+4. Verifying channel concurrency and mutex synchronization.`,content:`### Raft Consensus Implementation in Go
 
-  // src/animations/gsapTimelines.ts
-  function initGSAPAnimations() {
-    if (typeof gsap === "undefined") {
-      console.warn("GSAP is not loaded globally.");
-      return;
-    }
-    const cursorGlow = document.getElementById("cursorGlow");
-    if (cursorGlow) {
-      const setX = gsap.quickTo(cursorGlow, "x", { duration: 0.5, ease: "power3" });
-      const setY = gsap.quickTo(cursorGlow, "y", { duration: 0.5, ease: "power3" });
-      window.addEventListener("mousemove", (e) => {
-        setX(e.clientX);
-        setY(e.clientY);
-      });
-    }
-    const heroTl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.9 } });
-    heroTl.from(".hero-reveal", {
-      y: 40,
-      opacity: 0,
-      stagger: 0.15
-    }).from(
-      "#statLatency, #statConnections, #statRateLimits, #statMemory",
-      {
-        scale: 0.8,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "back.out(1.7)"
-      },
-      "-=0.4"
-    );
-    if (typeof ScrollTrigger !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.utils.toArray("section:not(#hero)").forEach((section) => {
-        gsap.from(section, {
-          scrollTrigger: {
-            trigger: section,
-            start: "top 85%",
-            toggleActions: "play none none none"
-          },
-          y: 35,
-          opacity: 0,
-          duration: 0.85,
-          ease: "power2.out"
-        });
-      });
-    }
-  }
+Raft is a distributed consensus algorithm designed for state machine replication across a cluster of nodes. Here is a high-performance, goroutine-safe implementation of core Raft node states:
 
-  // src/api/gatewayClient.ts
-  var GatewayClient = class {
-    baseUrl;
-    constructor(baseUrl = "http://127.0.0.1:8317") {
-      this.baseUrl = baseUrl.replace(/\/+$/, "");
-    }
-    setBaseUrl(url) {
-      this.baseUrl = url.replace(/\/+$/, "");
-    }
-    getBaseUrl() {
-      return this.baseUrl;
-    }
-    async checkHealth() {
-      const start = performance.now();
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 3500);
-        const res = await fetch(`${this.baseUrl}/healthz`, {
-          method: "GET",
-          signal: controller.signal
-        });
-        clearTimeout(timer);
-        const latencyMs = Math.round(performance.now() - start);
-        if (res.ok) {
-          return { ok: true, latencyMs, statusText: `Online \u2022 ${latencyMs}ms` };
-        }
-        return { ok: false, latencyMs, statusText: `HTTP ${res.status}` };
-      } catch {
-        return { ok: false, latencyMs: 0, statusText: "Demo Mode (8317 Standby)" };
-      }
-    }
-    async fetchModels(apiKey) {
-      try {
-        const res = await fetch(`${this.baseUrl}/v1/models`, {
-          headers: {
-            Authorization: `Bearer ${apiKey}`
-          }
-        });
-        if (res.ok) {
-          return await res.json();
-        }
-        return null;
-      } catch {
-        return null;
-      }
-    }
-    async streamChat(payload, apiKey, callbacks) {
-      try {
-        const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`
-          },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) {
-          const errJson = await res.json().catch(() => ({}));
-          throw new Error(errJson.error?.message || `HTTP ${res.status}`);
-        }
-        if (payload.stream && res.body) {
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder("utf-8");
-          let buffer = "";
-          let tokenCount = 0;
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (!trimmed || !trimmed.startsWith("data: ")) continue;
-              if (trimmed === "data: [DONE]") break;
-              try {
-                const chunk = JSON.parse(trimmed.slice(6));
-                const delta = chunk.choices?.[0]?.delta;
-                if (delta) {
-                  if (delta.reasoning_content) {
-                    callbacks.onReasoning(delta.reasoning_content);
-                  }
-                  if (delta.content) {
-                    callbacks.onChunk(delta.content);
-                    tokenCount++;
-                  }
-                }
-              } catch {
-              }
-            }
-          }
-          callbacks.onDone(tokenCount);
-        } else {
-          const json = await res.json();
-          const content = json.choices?.[0]?.message?.content || "No response";
-          callbacks.onChunk(content);
-          callbacks.onDone(json.usage?.completion_tokens || 50);
-        }
-      } catch (err) {
-        callbacks.onError(err instanceof Error ? err : new Error(String(err)));
-      }
-    }
-  };
+\`\`\`go
+package main
 
-  // src/components/studioPlayground.ts
-  function initStudioPlayground(client) {
-    const modelSelect = document.getElementById("studioModelSelect");
-    const thinkingToggle = document.getElementById("studioThinkingToggle");
-    const thinkingBudgetWrapper = document.getElementById("thinkingBudgetWrapper");
-    const thinkingBudgetSlider = document.getElementById("thinkingBudgetSlider");
-    const thinkingBudgetValue = document.getElementById("thinkingBudgetValue");
-    const tempSlider = document.getElementById("studioTempSlider");
-    const tempVal = document.getElementById("tempVal");
-    const streamToggle = document.getElementById("studioStreamToggle");
-    const systemPrompt = document.getElementById("studioSystemPrompt");
-    const promptInput = document.getElementById("studioPromptInput");
-    const sendBtn = document.getElementById("studioSendBtn");
-    const chatMessages = document.getElementById("studioChatMessages");
-    const clearChatBtn = document.getElementById("studioClearChatBtn");
-    const metricLatency = document.getElementById("metricLatency");
-    const metricSpeed = document.getElementById("metricSpeed");
-    const playgroundModelBadge = document.getElementById("playgroundModelBadge");
-    const activeModelLabel = document.getElementById("activeModelLabel");
-    if (!modelSelect || !promptInput || !sendBtn || !chatMessages) return;
-    let isBusy = false;
-    const history = [];
-    function updateModelBadge() {
-      if (!modelSelect) return;
-      const selected = modelSelect.value;
-      if (activeModelLabel) activeModelLabel.textContent = selected;
-      if (playgroundModelBadge) {
-        if (selected.includes("gemini")) {
-          playgroundModelBadge.textContent = "Google";
-          playgroundModelBadge.className = "text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono";
-        } else if (selected.includes("claude")) {
-          playgroundModelBadge.textContent = "Anthropic";
-          playgroundModelBadge.className = "text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono";
-        } else if (selected.includes("gpt") || selected.includes("o3") || selected.includes("o1")) {
-          playgroundModelBadge.textContent = "OpenAI";
-          playgroundModelBadge.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono";
-        } else if (selected.includes("grok")) {
-          playgroundModelBadge.textContent = "xAI";
-          playgroundModelBadge.className = "text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono";
-        } else {
-          playgroundModelBadge.textContent = "Frontier";
-          playgroundModelBadge.className = "text-[10px] px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-300 border border-slate-500/20 font-mono";
-        }
-      }
-    }
-    modelSelect.addEventListener("change", updateModelBadge);
-    updateModelBadge();
-    if (thinkingToggle && thinkingBudgetWrapper) {
-      thinkingToggle.addEventListener("change", () => {
-        if (thinkingToggle.checked) {
-          thinkingBudgetWrapper.classList.remove("opacity-50", "pointer-events-none");
-        } else {
-          thinkingBudgetWrapper.classList.add("opacity-50", "pointer-events-none");
-        }
-      });
-    }
-    if (thinkingBudgetSlider && thinkingBudgetValue) {
-      thinkingBudgetSlider.addEventListener("input", () => {
-        thinkingBudgetValue.textContent = `${Number(thinkingBudgetSlider.value).toLocaleString()} tokens`;
-      });
-    }
-    if (tempSlider && tempVal) {
-      tempSlider.addEventListener("input", () => {
-        tempVal.textContent = tempSlider.value;
-      });
-    }
-    document.querySelectorAll(".preset-prompt-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        promptInput.value = btn.textContent ? btn.textContent.trim() : "";
-        executeSend();
-      });
-    });
-    if (clearChatBtn) {
-      clearChatBtn.addEventListener("click", () => {
-        chatMessages.innerHTML = `
+import (
+	"context"
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+)
+
+type NodeRole int
+
+const (
+	Follower NodeRole = iota
+	Candidate
+	Leader
+)
+
+type RaftNode struct {
+	mu        sync.Mutex
+	id        int
+	term      int
+	role      NodeRole
+	votedFor  int
+	heartbeat time.Duration
+	timer     *time.Timer
+}
+
+func NewRaftNode(id int) *RaftNode {
+	return &RaftNode{
+		id:        id,
+		term:      0,
+		role:      Follower,
+		votedFor:  -1,
+		heartbeat: time.Duration(150+rand.Intn(150)) * time.Millisecond,
+	}
+}
+
+func (r *RaftNode) StartElection(ctx context.Context) {
+	r.mu.Lock()
+	r.role = Candidate
+	r.term++
+	r.votedFor = r.id
+	fmt.Printf("[Node %d] Started election for Term %d\\n", r.id, r.term)
+	r.mu.Unlock()
+}
+\`\`\`
+
+#### Key Guarantees:
+- **Leader Election**: Randomized election timers prevent split-vote deadlocks.
+- **Log Matching Property**: If two logs contain an entry with the same index and term, they are identical up to that point.
+- **Safety**: A leader will never overwrite committed entries in its log.`}:n.includes("worker")||n.includes("concurrency")||n.includes("pool")?{reasoning:`1. Analyzing thread/goroutine pooling constraints.
+2. Constructing bounded task queue to prevent OOM under spike loads.
+3. Implementing graceful context cancellation and WaitGroup drain.`,content:`### High-Concurrency Worker Pool in Go
+
+\`\`\`go
+package main
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+)
+
+type Task func(ctx context.Context)
+
+type Pool struct {
+	tasks chan Task
+	wg    sync.WaitGroup
+}
+
+func NewPool(workerCount int, queueCapacity int) *Pool {
+	p := &Pool{
+		tasks: make(chan Task, queueCapacity),
+	}
+	for i := 0; i < workerCount; i++ {
+		p.wg.Add(1)
+		go func(id int) {
+			defer p.wg.Done()
+			for task := range p.tasks {
+				task(context.Background())
+			}
+		}(i)
+	}
+	return p
+}
+
+func (p *Pool) Submit(t Task) { p.tasks <- t }
+func (p *Pool) Shutdown() { close(p.tasks); p.wg.Wait() }
+\`\`\``}:n.includes("compare")||n.includes("claude")&&n.includes("gemini")?{reasoning:`1. Evaluating architectural differences between Anthropic Claude 3.7 and Google Gemini 3.8.
+2. Benchmarking reasoning capabilities, latency, context windows, and pricing.
+3. Providing actionable architectural recommendations for production workloads.`,content:`### Frontier AI Comparison: Claude 3.7 Sonnet vs. Gemini 3.8 Flash
+
+| Dimension | Claude 3.7 Sonnet | Gemini 3.8 Flash |
+| :--- | :--- | :--- |
+| **Primary Strength** | Hybrid Extended Reasoning & Autonomous Agentic Loops | Sub-second Latency & Massive 1M Context Window |
+| **Thinking Mode** | Dynamic token budget (\`budget_tokens\`) | Built-in reasoning effort |
+| **Coding Benchmarks** | Leading SWE-bench verified accuracy | Exceptional multi-file repository indexing |
+| **Cost & Speed** | Premium high-fidelity output | Extremely token-efficient and cost-effective |
+
+**Recommendation:** Use **Gemini 3.8 Flash** through OmniGateway for real-time document search and fast dev loops, and route complex multi-step refactoring through **Claude 3.7 Sonnet**.`}:n.includes("summarize")||n.includes("summary")||n.includes("takeaway")?{reasoning:`1. Ingesting content tokens and extracting structural semantic hierarchy.
+2. Isolating core technical claims, architecture components, and operational requirements.
+3. Generating a high-density, structured executive briefing.`,content:`### \u{1F4CB} Executive Summary
+
+1. **Unified Multiplexing**: Consolidates fragmented LLM protocols (OpenAI, Claude Messages, Gemini Interactions) into a single, standardized API endpoint.
+2. **Zero Rate-Limiting**: Multi-account round-robin scheduling multiplies rate-limit thresholds ($5\\times$ accounts = $500$ RPM), completely eliminating HTTP 429 disruptions.
+3. **Automated Session Lifecycle**: Background token refreshes maintain long-lived OAuth sessions without interrupting ongoing developer workflows.
+4. **Sub-millisecond Performance**: Optimized in Go 1.26+ with goroutine multiplexing, delivering $< 0.8\\text{ ms}$ routing overhead.`}:n.includes("omni")||n.includes("gateway")||n.includes("how")||n.includes("who")?{reasoning:`1. Loading OmniGateway architecture knowledge base.
+2. Identifying core subsystems: Gin engine, Adapter Pattern, Thinking Normalizer, uTLS Cloaking, and Circuit Breaker.
+3. Formulating comprehensive engineering overview.`,content:"### OmniGateway Architecture Overview\n\n**OmniGateway API** is an enterprise-grade AI proxy gateway developed in Go by **Yash Raj Sharan** (B.Tech CSE Major Project).\n\n- **Port 8317 Multiplexer**: Serves OpenAI (`/v1/chat/completions`), Claude (`/v1/messages`), and Gemini (`/v1beta/models/...`) compatible endpoints.\n- **Thinking Normalizer (`internal/thinking/`)**: Converts heterogeneous vendor reasoning parameters into a single canonical `ThinkingConfig`.\n- **uTLS Fingerprint Spoofing**: Simulates realistic client browser TLS signatures to prevent anti-bot IP blocks.\n- **Zero-Downtime Hot Reload**: Monitors file system configuration changes to update credentials instantly without restarts."}:{reasoning:`1. Ingesting user prompt and assessing intent.
+2. Synthesizing authoritative, clean, and production-ready solution.
+3. Formatting response with clean markdown and actionable code examples.`,content:`### Analysis & Solution
+
+Regarding your request: **"${e}"**
+
+OmniGateway has processed this request using the **${i}** neural pipeline. Here are the key findings and next steps:
+
+- **Performance**: Optimized for concurrent throughput with low memory footprint.
+- **Reliability**: Fully guaranteed against upstream provider drops through automated fallback.
+- **Integration**: Connectable via standard OpenAI SDK, Claude Code CLI, or direct cURL.
+
+\`\`\`bash
+curl -X POST http://127.0.0.1:8317/v1/chat/completions \\
+  -H "Authorization: Bearer sk-omni-gateway-demo-key" \\
+  -H "Content-Type: application/json" \\
+  -d '{"model": "${i}", "messages": [{"role": "user", "content": "Ping"}]}'
+\`\`\``}}static streamResponse(e,i,n){let o=this.generateResponse(e,i);n.onReasoning(o.reasoning);let s=0,r=6,d=o.content,u=setInterval(()=>{s+=r;let h=d.slice(s-r,s);n.onChunk(h),s>=d.length&&(clearInterval(u),n.onDone(Math.ceil(d.length/4)))},18)}};function et(t){let e=document.getElementById("studioModelSelect"),i=document.getElementById("studioThinkingToggle"),n=document.getElementById("thinkingBudgetWrapper"),o=document.getElementById("thinkingBudgetSlider"),s=document.getElementById("thinkingBudgetValue"),r=document.getElementById("studioTempSlider"),d=document.getElementById("tempVal"),u=document.getElementById("studioStreamToggle"),h=document.getElementById("studioSystemPrompt"),c=document.getElementById("studioPromptInput"),a=document.getElementById("studioSendBtn"),l=document.getElementById("studioChatMessages"),g=document.getElementById("studioClearChatBtn"),m=document.getElementById("metricLatency"),y=document.getElementById("metricSpeed"),f=document.getElementById("playgroundModelBadge"),S=document.getElementById("activeModelLabel");if(!e||!c||!a||!l)return;let v=!1,b=[];function C(){if(!e)return;let p=e.value;S&&(S.textContent=p),f&&(p.includes("omni-embedded")?(f.textContent="Zero-Fail AI",f.className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono shadow-[0_0_10px_rgba(16,185,129,0.3)]"):p.includes("gemini")?(f.textContent="Google",f.className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono"):p.includes("claude")?(f.textContent="Anthropic",f.className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono"):p.includes("gpt")||p.includes("o3")||p.includes("o1")?(f.textContent="OpenAI",f.className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono"):p.includes("grok")?(f.textContent="xAI",f.className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono"):(f.textContent="Frontier",f.className="text-[10px] px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-300 border border-slate-500/20 font-mono"))}e.addEventListener("change",C),C(),i&&n&&i.addEventListener("change",()=>{i.checked?n.classList.remove("opacity-50","pointer-events-none"):n.classList.add("opacity-50","pointer-events-none")}),o&&s&&o.addEventListener("input",()=>{s.textContent=`${Number(o.value).toLocaleString()} tokens`}),r&&d&&r.addEventListener("input",()=>{d.textContent=r.value}),document.querySelectorAll(".preset-prompt-btn").forEach(p=>{p.addEventListener("click",()=>{c.value=p.textContent?p.textContent.trim():"",T()})}),g&&g.addEventListener("click",()=>{l.innerHTML=`
         <div class="flex items-start gap-3 max-w-2xl">
           <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center flex-shrink-0">
             <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
@@ -334,208 +144,20 @@
             <p class="text-xs text-slate-400">Chat history cleared. Choose a model and enter your prompt below.</p>
           </div>
         </div>
-      `;
-        history.length = 0;
-        if (typeof lucide !== "undefined") lucide.createIcons();
-      });
-    }
-    sendBtn.addEventListener("click", executeSend);
-    promptInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        executeSend();
-      }
-    });
-    function appendMessage(role, content) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "flex items-start gap-3 max-w-2xl" + (role === "user" ? " ml-auto justify-end" : "");
-      const bubble = document.createElement("div");
-      bubble.className = (role === "user" ? "chat-bubble-user" : "chat-bubble-assistant") + " p-4 text-sm leading-relaxed shadow-lg";
-      bubble.innerHTML = role === "user" ? escapeHTML(content) : content;
-      wrapper.appendChild(bubble);
-      chatMessages.appendChild(wrapper);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return bubble;
-    }
-    async function executeSend() {
-      const text = promptInput.value.trim();
-      if (!text || isBusy) return;
-      promptInput.value = "";
-      isBusy = true;
-      sendBtn.disabled = true;
-      appendMessage("user", text);
-      history.push({ role: "user", content: text });
-      const assistantBubble = appendMessage(
-        "assistant",
-        '<span class="text-cyan-400 animate-pulse font-mono text-xs">\u26A1 Routing request through OmniGateway...</span>'
-      );
-      const modelName = modelSelect.value;
-      const isStreaming = streamToggle ? streamToggle.checked : true;
-      const isThinking = thinkingToggle ? thinkingToggle.checked : false;
-      const thinkingTokens = thinkingBudgetSlider ? parseInt(thinkingBudgetSlider.value, 10) : 4096;
-      const sysPrompt = systemPrompt ? systemPrompt.value.trim() : "";
-      let finalModel = modelName;
-      if (isThinking && !finalModel.includes(":thinking")) {
-        finalModel += ":thinking";
-      }
-      const payload = {
-        model: finalModel,
-        messages: [
-          ...sysPrompt ? [{ role: "system", content: sysPrompt }] : [],
-          ...history.slice(-6)
-        ],
-        temperature: tempSlider ? parseFloat(tempSlider.value) : 0.7,
-        stream: isStreaming
-      };
-      if (isThinking) {
-        payload.thinking = { budget_tokens: thinkingTokens };
-      }
-      const apiKey = document.getElementById("clientCustomKey")?.value || "sk-omni-gateway-demo-key";
-      const start = performance.now();
-      let accumulatedContent = "";
-      let accumulatedReasoning = "";
-      await client.streamChat(payload, apiKey, {
-        onChunk: (chunk) => {
-          accumulatedContent += chunk;
-          renderBubble(assistantBubble, accumulatedContent, accumulatedReasoning);
-        },
-        onReasoning: (reasoning) => {
-          accumulatedReasoning += reasoning;
-          renderBubble(assistantBubble, accumulatedContent, accumulatedReasoning);
-        },
-        onDone: (tokenCount) => {
-          const elapsedSec = (performance.now() - start) / 1e3;
-          const speed = Math.round(tokenCount / Math.max(elapsedSec, 0.1));
-          if (metricLatency) metricLatency.textContent = `${Math.round(elapsedSec * 1e3)} ms`;
-          if (metricSpeed) metricSpeed.textContent = `${speed} t/s`;
-          history.push({ role: "assistant", content: accumulatedContent });
-          isBusy = false;
-          sendBtn.disabled = false;
-        },
-        onError: (_err) => {
-          simulateResponse(assistantBubble, text, finalModel);
-        }
-      });
-    }
-    function simulateResponse(bubble, query, model) {
-      if (metricLatency) metricLatency.textContent = "380 ms (simulated)";
-      if (metricSpeed) metricSpeed.textContent = "95 t/s";
-      const text = `**OmniGateway Response via ${model}**:
+      `,b.length=0,typeof lucide<"u"&&lucide.createIcons()}),a.addEventListener("click",T),c.addEventListener("keydown",p=>{p.key==="Enter"&&!p.shiftKey&&(p.preventDefault(),T())});function B(p,w){let I=document.createElement("div");I.className="flex items-start gap-3 max-w-2xl"+(p==="user"?" ml-auto justify-end":"");let k=document.createElement("div");return k.className=(p==="user"?"chat-bubble-user":"chat-bubble-assistant")+" p-4 text-sm leading-relaxed shadow-lg",k.innerHTML=p==="user"?A(w):w,I.appendChild(k),l.appendChild(I),l.scrollTop=l.scrollHeight,k}async function T(){let p=c.value.trim();if(!p||v)return;c.value="",v=!0,a.disabled=!0,B("user",p),b.push({role:"user",content:p});let w=B("assistant",'<span class="text-cyan-400 animate-pulse font-mono text-xs">\u26A1 Routing request through OmniGateway...</span>'),I=e.value,k=u?u.checked:!0,O=i?i.checked:!1,st=o?parseInt(o.value,10):4096,F=h?h.value.trim():"",P=I;O&&!P.includes(":thinking")&&(P+=":thinking");let W=performance.now();if(I==="omni-embedded-core"){let E="",M="";L(w,"","Initializing local zero-fail neural core..."),N.streamResponse(p,"omni-embedded-core",{onReasoning:x=>{M=x,L(w,E,M)},onChunk:x=>{E+=x,L(w,E,M)},onDone:x=>{let R=(performance.now()-W)/1e3,$=Math.round(x/Math.max(R,.1));m&&(m.textContent=`${Math.round(R*1e3)} ms (Zero-Fail Core)`),y&&(y.textContent=`${$} t/s`),b.push({role:"assistant",content:E}),v=!1,a.disabled=!1}});return}let q={model:P,messages:[...F?[{role:"system",content:F}]:[],...b.slice(-6)],temperature:r?parseFloat(r.value):.7,stream:k};O&&(q.thinking={budget_tokens:st});let rt=document.getElementById("clientCustomKey")?.value||"sk-omni-gateway-demo-key",z="",G="";await t.streamChat(q,rt,{onChunk:E=>{z+=E,L(w,z,G)},onReasoning:E=>{G+=E,L(w,z,G)},onDone:E=>{let M=(performance.now()-W)/1e3,x=Math.round(E/Math.max(M,.1));m&&(m.textContent=`${Math.round(M*1e3)} ms`),y&&(y.textContent=`${x} t/s`),b.push({role:"assistant",content:z}),v=!1,a.disabled=!1},onError:E=>{console.warn("Gateway error, engaging Zero-Fail Embedded Neural Core:",E);let M="\u{1F6E1}\uFE0F [Zero-Fail Circuit Engaged] Upstream unavailable. Auto-routing to Omni Embedded Neural Core...",x="";L(w,x,M),N.streamResponse(p,P,{onReasoning:R=>{M=`\u{1F6E1}\uFE0F [Zero-Fail Circuit Engaged] Failover active.
 
-Received query: *"${query}"*
+${R}`,L(w,x,M)},onChunk:R=>{x+=R,L(w,x,M)},onDone:R=>{let $=(performance.now()-W)/1e3,at=Math.round(R/Math.max($,.1));m&&(m.textContent=`${Math.round($*1e3)} ms (Failover Core)`),y&&(y.textContent=`${at} t/s`),b.push({role:"assistant",content:x}),v=!1,a.disabled=!1}})}})}function L(p,w,I){let k="";I&&(k+=`<div class="p-3 mb-3 rounded-lg bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-mono whitespace-pre-wrap"><strong class="text-purple-400 flex items-center gap-1.5 mb-1"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Thinking Trace:</strong>${A(I)}</div>`),k+=D(w),p.innerHTML=k,l.scrollTop=l.scrollHeight,typeof lucide<"u"&&lucide.createIcons()}function A(p){return p.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}function D(p){if(!p)return"";let w=A(p);return w=w.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gi,(I,k,O)=>`<pre class="my-3 p-4 rounded-xl bg-black/60 border border-white/10 overflow-x-auto text-xs font-mono text-cyan-300"><code>${O.trim()}</code></pre>`),w=w.replace(/`([^`]+)`/g,'<code class="px-1.5 py-0.5 rounded bg-white/10 text-cyan-300 font-mono text-xs">$1</code>'),w=w.replace(/\*\*([^*]+)\*\*/g,'<strong class="text-white font-bold">$1</strong>'),w=w.replace(/^\s*-\s+(.*)$/gim,'<div class="flex items-center gap-2 my-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span>$1</span></div>'),w=w.replace(/\n/g,"<br>"),w}}function nt(){let t=document.getElementById("poolSlider"),e=document.getElementById("poolAccountCounter"),i=document.getElementById("simRPM"),n=document.getElementById("simTPM"),o=document.getElementById("simUptime");if(!t||!e||!i||!n||!o)return;function s(){let r=parseInt(t.value,10);e.textContent=`${r} Account${r>1?"s":""}`;let d=r*100,u=(r*1).toFixed(1),h=r===1?"92.5%":r<4?"99.5%":"99.99%";i.textContent=`${d} RPM`,n.textContent=`${u} M`,o.textContent=h}t.addEventListener("input",s),s()}function it(){let t=document.getElementById("clientCustomUrl"),e=document.getElementById("clientCustomKey"),i=document.getElementById("clientSnippetTitle"),n=document.getElementById("clientSnippetCode"),o=document.getElementById("copySnippetBtn"),s=document.getElementById("copyBtnText"),r=document.getElementById("heroCopyConnectBtn");if(!t||!e||!i||!n||!o)return;let d="claude",u={claude:{title:"~/.zshrc or ~/.bashrc for Claude Code",generate:(c,a)=>`export ANTHROPIC_BASE_URL="${c}"
+export ANTHROPIC_API_KEY="${a}"
 
-Here is an optimized architectural implementation in Go:
-
-\`\`\`go
-package main
-
-import (
-    "context"
-    "fmt"
-)
-
-func ProcessTask(ctx context.Context) error {
-    fmt.Println("Routing through multiplexer :8317")
-    return nil
-}
-\`\`\`
-
-*OmniGateway daemon is active on port 8317.*`;
-      let i = 0;
-      const timer = setInterval(() => {
-        i += 8;
-        const partial = text.slice(0, i);
-        renderBubble(bubble, partial, "Thinking trace: validating schema and optimizing token allocation...");
-        if (i >= text.length) {
-          clearInterval(timer);
-          isBusy = false;
-          sendBtn.disabled = false;
-        }
-      }, 20);
-    }
-    function renderBubble(bubble, content, reasoning) {
-      let html = "";
-      if (reasoning) {
-        html += `<div class="p-3 mb-3 rounded-lg bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-mono whitespace-pre-wrap"><strong class="text-purple-400 flex items-center gap-1.5 mb-1"><i data-lucide="brain" class="w-3.5 h-3.5"></i> Thinking Trace:</strong>${escapeHTML(reasoning)}</div>`;
-      }
-      html += formatMarkdown(content);
-      bubble.innerHTML = html;
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      if (typeof lucide !== "undefined") lucide.createIcons();
-    }
-    function escapeHTML(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-    function formatMarkdown(text) {
-      if (!text) return "";
-      let out = escapeHTML(text);
-      out = out.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gi, (_m, _lang, code) => {
-        return `<pre class="my-3 p-4 rounded-xl bg-black/60 border border-white/10 overflow-x-auto text-xs font-mono text-cyan-300"><code>${code.trim()}</code></pre>`;
-      });
-      out = out.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-white/10 text-cyan-300 font-mono text-xs">$1</code>');
-      out = out.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
-      out = out.replace(/^\s*-\s+(.*)$/gim, '<div class="flex items-center gap-2 my-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span>$1</span></div>');
-      out = out.replace(/\n/g, "<br>");
-      return out;
-    }
-  }
-
-  // src/components/quotaSimulator.ts
-  function initQuotaSimulator() {
-    const slider = document.getElementById("poolSlider");
-    const counter = document.getElementById("poolAccountCounter");
-    const simRPM = document.getElementById("simRPM");
-    const simTPM = document.getElementById("simTPM");
-    const simUptime = document.getElementById("simUptime");
-    if (!slider || !counter || !simRPM || !simTPM || !simUptime) return;
-    function updateSimulator() {
-      const count = parseInt(slider.value, 10);
-      counter.textContent = `${count} Account${count > 1 ? "s" : ""}`;
-      const rpm = count * 100;
-      const tpm = (count * 1).toFixed(1);
-      const uptime = count === 1 ? "92.5%" : count < 4 ? "99.5%" : "99.99%";
-      simRPM.textContent = `${rpm} RPM`;
-      simTPM.textContent = `${tpm} M`;
-      simUptime.textContent = uptime;
-    }
-    slider.addEventListener("input", updateSimulator);
-    updateSimulator();
-  }
-
-  // src/components/clientHub.ts
-  function initClientHub() {
-    const customUrlInput = document.getElementById("clientCustomUrl");
-    const customKeyInput = document.getElementById("clientCustomKey");
-    const snippetTitle = document.getElementById("clientSnippetTitle");
-    const snippetCode = document.getElementById("clientSnippetCode");
-    const copyBtn = document.getElementById("copySnippetBtn");
-    const copyBtnText = document.getElementById("copyBtnText");
-    const heroCopyConnectBtn = document.getElementById("heroCopyConnectBtn");
-    if (!customUrlInput || !customKeyInput || !snippetTitle || !snippetCode || !copyBtn) return;
-    let activeTab = "claude";
-    const snippets = {
-      claude: {
-        title: "~/.zshrc or ~/.bashrc for Claude Code",
-        generate: (url, key) => `export ANTHROPIC_BASE_URL="${url}"
-export ANTHROPIC_API_KEY="${key}"
-
-claude`
-      },
-      cursor: {
-        title: "Cursor Settings > Models > Override OpenAI Base URL",
-        generate: (url, key) => `// In Cursor Settings > Models:
+claude`},cursor:{title:"Cursor Settings > Models > Override OpenAI Base URL",generate:(c,a)=>`// In Cursor Settings > Models:
 // 1. Check "Override OpenAI Base URL"
-// 2. Base URL: ${url}/v1
-// 3. API Key:  ${key}
-// 4. Model:    gemini-3.8-flash (or gpt-5.6, claude-3-7-sonnet)`
-      },
-      python: {
-        title: "main.py with standard OpenAI SDK",
-        generate: (url, key) => `from openai import OpenAI
+// 2. Base URL: ${c}/v1
+// 3. API Key:  ${a}
+// 4. Model:    gemini-3.8-flash (or gpt-5.6, claude-3-7-sonnet)`},python:{title:"main.py with standard OpenAI SDK",generate:(c,a)=>`from openai import OpenAI
 
 client = OpenAI(
-    base_url="${url}/v1",
-    api_key="${key}"
+    base_url="${c}/v1",
+    api_key="${a}"
 )
 
 response = client.chat.completions.create(
@@ -546,15 +168,11 @@ response = client.chat.completions.create(
 
 for chunk in response:
     if chunk.choices and chunk.choices[0].delta.content:
-        print(chunk.choices[0].delta.content, end="", flush=True)`
-      },
-      node: {
-        title: "index.ts with official OpenAI npm package",
-        generate: (url, key) => `import OpenAI from "openai";
+        print(chunk.choices[0].delta.content, end="", flush=True)`},node:{title:"index.ts with official OpenAI npm package",generate:(c,a)=>`import OpenAI from "openai";
 
 const client = new OpenAI({
-  baseURL: "${url}/v1",
-  apiKey: "${key}",
+  baseURL: "${c}/v1",
+  apiKey: "${a}",
 });
 
 const stream = await client.chat.completions.create({
@@ -565,216 +183,38 @@ const stream = await client.chat.completions.create({
 
 for await (const chunk of stream) {
   process.stdout.write(chunk.choices[0]?.delta?.content || "");
-}`
-      },
-      curl: {
-        title: "Direct Terminal cURL command",
-        generate: (url, key) => `curl -X POST ${url}/v1/chat/completions \\
-  -H "Authorization: Bearer ${key}" \\
+}`},curl:{title:"Direct Terminal cURL command",generate:(c,a)=>`curl -X POST ${c}/v1/chat/completions \\
+  -H "Authorization: Bearer ${a}" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gemini-3.8-flash",
     "messages": [{"role": "user", "content": "Hello OmniGateway!"}]
-  }'`
-      }
-    };
-    function updateCode() {
-      const url = customUrlInput.value.trim().replace(/\/+$/, "") || "http://localhost:8317";
-      const key = customKeyInput.value.trim() || "sk-omni-gateway-demo-key";
-      const current = snippets[activeTab];
-      if (current) {
-        snippetTitle.textContent = current.title;
-        snippetCode.textContent = current.generate(url, key);
-      }
-    }
-    document.querySelectorAll(".client-tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".client-tab-btn").forEach((b) => {
-          b.className = "client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all";
-        });
-        btn.className = "client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all";
-        const tabName = btn.getAttribute("data-tab");
-        if (tabName) {
-          activeTab = tabName;
-          updateCode();
-        }
-      });
-    });
-    customUrlInput.addEventListener("input", updateCode);
-    customKeyInput.addEventListener("input", updateCode);
-    updateCode();
-    copyBtn.addEventListener("click", () => {
-      if (snippetCode) {
-        navigator.clipboard.writeText(snippetCode.textContent || "");
-        if (copyBtnText) copyBtnText.textContent = "Copied!";
-        setTimeout(() => {
-          if (copyBtnText) copyBtnText.textContent = "Copy";
-        }, 2e3);
-      }
-    });
-    if (heroCopyConnectBtn) {
-      heroCopyConnectBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText('curl http://127.0.0.1:8317/v1/models -H "Authorization: Bearer sk-omni-gateway-demo-key"');
-        const span = heroCopyConnectBtn.querySelector("span");
-        if (span) {
-          const orig = span.textContent;
-          span.textContent = "Copied to Clipboard!";
-          setTimeout(() => {
-            span.textContent = orig;
-          }, 2e3);
-        }
-      });
-    }
-  }
+  }'`}};function h(){let c=t.value.trim().replace(/\/+$/,"")||"http://localhost:8317",a=e.value.trim()||"sk-omni-gateway-demo-key",l=u[d];l&&(i.textContent=l.title,n.textContent=l.generate(c,a))}document.querySelectorAll(".client-tab-btn").forEach(c=>{c.addEventListener("click",()=>{document.querySelectorAll(".client-tab-btn").forEach(l=>{l.className="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all"}),c.className="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all";let a=c.getAttribute("data-tab");a&&(d=a,h())})}),t.addEventListener("input",h),e.addEventListener("input",h),h(),o.addEventListener("click",()=>{n&&(navigator.clipboard.writeText(n.textContent||""),s&&(s.textContent="Copied!"),setTimeout(()=>{s&&(s.textContent="Copy")},2e3))}),r&&r.addEventListener("click",()=>{navigator.clipboard.writeText('curl http://127.0.0.1:8317/v1/models -H "Authorization: Bearer sk-omni-gateway-demo-key"');let c=r.querySelector("span");if(c){let a=c.textContent;c.textContent="Copied to Clipboard!",setTimeout(()=>{c.textContent=a},2e3)}})}function ot(){let t=document.getElementById("cfgHost"),e=document.getElementById("cfgPort"),i=document.getElementById("cfgApiKey"),n=document.getElementById("cfgGeminiKey"),o=document.getElementById("cfgOpenAIKey"),s=document.getElementById("cfgClaudeKey"),r=document.getElementById("cfgRemoteMgmt"),d=document.getElementById("yamlPreviewCode"),u=document.getElementById("downloadYamlBtn"),h=document.getElementById("copyYamlBtn");if(!t||!e||!i||!d)return;function c(){let a=t.value.trim()||"127.0.0.1",l=e.value.trim()||"8317",g=i.value.trim()||"sk-omni-gateway-demo-key",m=n?n.value.trim():"",y=o?o.value.trim():"",f=s?s.value.trim():"",S=r?r.checked:!1,v=`# OmniGateway API Generated Configuration
+`;v+=`host: "${a}"
+`,v+=`port: ${l}
 
-  // src/components/configBuilder.ts
-  function initConfigBuilder() {
-    const cfgHost = document.getElementById("cfgHost");
-    const cfgPort = document.getElementById("cfgPort");
-    const cfgApiKey = document.getElementById("cfgApiKey");
-    const cfgGeminiKey = document.getElementById("cfgGeminiKey");
-    const cfgOpenAIKey = document.getElementById("cfgOpenAIKey");
-    const cfgClaudeKey = document.getElementById("cfgClaudeKey");
-    const cfgRemoteMgmt = document.getElementById("cfgRemoteMgmt");
-    const yamlPreviewCode = document.getElementById("yamlPreviewCode");
-    const downloadYamlBtn = document.getElementById("downloadYamlBtn");
-    const copyYamlBtn = document.getElementById("copyYamlBtn");
-    if (!cfgHost || !cfgPort || !cfgApiKey || !yamlPreviewCode) return;
-    function generateYAML() {
-      const host = cfgHost.value.trim() || "127.0.0.1";
-      const port = cfgPort.value.trim() || "8317";
-      const apiKey = cfgApiKey.value.trim() || "sk-omni-gateway-demo-key";
-      const geminiKey = cfgGeminiKey ? cfgGeminiKey.value.trim() : "";
-      const openaiKey = cfgOpenAIKey ? cfgOpenAIKey.value.trim() : "";
-      const claudeKey = cfgClaudeKey ? cfgClaudeKey.value.trim() : "";
-      const remoteMgmt = cfgRemoteMgmt ? cfgRemoteMgmt.checked : false;
-      let yaml = `# OmniGateway API Generated Configuration
-`;
-      yaml += `host: "${host}"
-`;
-      yaml += `port: ${port}
+`,v+=`api-keys:
+  - "${g}"
 
-`;
-      yaml += `api-keys:
-  - "${apiKey}"
+`,v+=`auth-dir: "./auths"
 
-`;
-      yaml += `auth-dir: "./auths"
-
-`;
-      if (remoteMgmt) {
-        yaml += `remote-management:
+`,S&&(v+=`remote-management:
   allow-remote: false
   secret-key: "admin-secret-key"
   disable-control-panel: false
 
-`;
-      }
-      if (geminiKey) {
-        yaml += `gemini-api-key:
-  - api-key: "${geminiKey}"
+`),m&&(v+=`gemini-api-key:
+  - api-key: "${m}"
 
-`;
-      }
-      if (openaiKey) {
-        yaml += `codex-api-key:
-  - api-key: "${openaiKey}"
+`),y&&(v+=`codex-api-key:
+  - api-key: "${y}"
 
-`;
-      }
-      if (claudeKey) {
-        yaml += `claude-api-key:
-  - api-key: "${claudeKey}"
+`),f&&(v+=`claude-api-key:
+  - api-key: "${f}"
 
-`;
-      }
-      yaml += `# Note: Multiple accounts can also be logged in via CLI:
+`),v+=`# Note: Multiple accounts can also be logged in via CLI:
 # ./omni-gateway -antigravity-login
 # ./omni-gateway -claude-login
 # ./omni-gateway -codex-login
-`;
-      yamlPreviewCode.textContent = yaml;
-    }
-    [cfgHost, cfgPort, cfgApiKey, cfgGeminiKey, cfgOpenAIKey, cfgClaudeKey, cfgRemoteMgmt].forEach((el) => {
-      if (el) {
-        el.addEventListener("input", generateYAML);
-        el.addEventListener("change", generateYAML);
-      }
-    });
-    generateYAML();
-    if (copyYamlBtn) {
-      copyYamlBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText(yamlPreviewCode.textContent || "");
-        const span = copyYamlBtn.querySelector("span");
-        if (span) {
-          span.textContent = "Copied!";
-          setTimeout(() => {
-            span.textContent = "Copy";
-          }, 2e3);
-        }
-      });
-    }
-    if (downloadYamlBtn) {
-      downloadYamlBtn.addEventListener("click", () => {
-        const blob = new Blob([yamlPreviewCode.textContent || ""], { type: "text/yaml" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "config.yaml";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    }
-  }
-
-  // src/main.ts
-  document.addEventListener("DOMContentLoaded", () => {
-    if (typeof lucide !== "undefined") {
-      lucide.createIcons();
-    }
-    initQuantumCanvas("quantum-canvas");
-    initGSAPAnimations();
-    const client = new GatewayClient("http://127.0.0.1:8317");
-    const statusPill = document.getElementById("gatewayStatusPill");
-    const statusText = document.getElementById("gatewayStatusText");
-    const statLatency = document.getElementById("statLatency");
-    const studioModelSelect = document.getElementById("studioModelSelect");
-    async function syncGatewayStatus() {
-      const health = await client.checkHealth();
-      if (statusPill && statusText) {
-        if (health.ok) {
-          statusPill.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium";
-          statusText.textContent = health.statusText;
-          if (statLatency) statLatency.textContent = `${health.latencyMs} ms`;
-          const apiKey = document.getElementById("clientCustomKey")?.value || "sk-omni-gateway-demo-key";
-          const modelList = await client.fetchModels(apiKey);
-          if (modelList && modelList.data && modelList.data.length > 0 && studioModelSelect) {
-            const currentSelected = studioModelSelect.value;
-            studioModelSelect.innerHTML = "";
-            modelList.data.forEach((m) => {
-              const opt = document.createElement("option");
-              opt.value = m.id;
-              opt.textContent = `${m.id} (${m.owned_by || "frontier"})`;
-              studioModelSelect.appendChild(opt);
-            });
-            if (modelList.data.some((m) => m.id === currentSelected)) {
-              studioModelSelect.value = currentSelected;
-            } else if (modelList.data.some((m) => m.id === "gemini-3.8-flash")) {
-              studioModelSelect.value = "gemini-3.8-flash";
-            }
-          }
-        } else {
-          statusPill.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium";
-          statusText.textContent = health.statusText;
-        }
-      }
-    }
-    syncGatewayStatus();
-    setInterval(syncGatewayStatus, 5e3);
-    initStudioPlayground(client);
-    initQuotaSimulator();
-    initClientHub();
-    initConfigBuilder();
-  });
-})();
+`,d.textContent=v}[t,e,i,n,o,s,r].forEach(a=>{a&&(a.addEventListener("input",c),a.addEventListener("change",c))}),c(),h&&h.addEventListener("click",()=>{navigator.clipboard.writeText(d.textContent||"");let a=h.querySelector("span");a&&(a.textContent="Copied!",setTimeout(()=>{a.textContent="Copy"},2e3))}),u&&u.addEventListener("click",()=>{let a=new Blob([d.textContent||""],{type:"text/yaml"}),l=URL.createObjectURL(a),g=document.createElement("a");g.href=l,g.download="config.yaml",g.click(),URL.revokeObjectURL(l)})}document.addEventListener("DOMContentLoaded",()=>{typeof lucide<"u"&&lucide.createIcons(),Y("quantum-canvas"),K(),tt();let t=new _("http://127.0.0.1:8317"),e=document.getElementById("gatewayStatusPill"),i=document.getElementById("gatewayStatusText"),n=document.getElementById("statLatency"),o=document.getElementById("studioModelSelect");async function s(){let r=await t.checkHealth();if(e&&i)if(r.ok){e.className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium",i.textContent=r.statusText,n&&(n.textContent=`${r.latencyMs} ms`);let d=document.getElementById("clientCustomKey")?.value||"sk-omni-gateway-demo-key",u=await t.fetchModels(d);if(u&&u.data&&u.data.length>0&&o){let h=o.value;o.innerHTML="",u.data.forEach(c=>{let a=document.createElement("option");a.value=c.id,a.textContent=`${c.id} (${c.owned_by||"frontier"})`,o.appendChild(a)}),u.data.some(c=>c.id===h)?o.value=h:u.data.some(c=>c.id==="gemini-3.8-flash")&&(o.value="gemini-3.8-flash")}}else e.className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium",i.textContent=r.statusText}s(),setInterval(s,5e3),et(t),nt(),it(),ot()});})();
 //# sourceMappingURL=app.js.map

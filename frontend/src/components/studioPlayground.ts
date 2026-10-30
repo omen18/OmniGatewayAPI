@@ -2,6 +2,7 @@
 
 import { GatewayClient } from '../api/gatewayClient';
 import { ChatMessage, ChatCompletionRequest } from '../types/gateway';
+import { EmbeddedAIEngine } from '../api/embeddedAI';
 
 declare const lucide: any;
 
@@ -36,7 +37,10 @@ export function initStudioPlayground(client: GatewayClient): void {
     if (activeModelLabel) activeModelLabel.textContent = selected;
 
     if (playgroundModelBadge) {
-      if (selected.includes('gemini')) {
+      if (selected.includes('omni-embedded')) {
+        playgroundModelBadge.textContent = 'Zero-Fail AI';
+        playgroundModelBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono shadow-[0_0_10px_rgba(16,185,129,0.3)]';
+      } else if (selected.includes('gemini')) {
         playgroundModelBadge.textContent = 'Google';
         playgroundModelBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono';
       } else if (selected.includes('claude')) {
@@ -157,6 +161,36 @@ export function initStudioPlayground(client: GatewayClient): void {
       finalModel += ':thinking';
     }
 
+    const start = performance.now();
+
+    // Direct Zero-Fail Embedded Neural Core execution
+    if (modelName === 'omni-embedded-core') {
+      let accumulatedContent = '';
+      let accumulatedReasoning = '';
+      renderBubble(assistantBubble, '', 'Initializing local zero-fail neural core...');
+
+      EmbeddedAIEngine.streamResponse(text, 'omni-embedded-core', {
+        onReasoning: (reasoningChunk: string) => {
+          accumulatedReasoning = reasoningChunk;
+          renderBubble(assistantBubble, accumulatedContent, accumulatedReasoning);
+        },
+        onChunk: (chunk: string) => {
+          accumulatedContent += chunk;
+          renderBubble(assistantBubble, accumulatedContent, accumulatedReasoning);
+        },
+        onDone: (tokenCount: number) => {
+          const elapsedSec = (performance.now() - start) / 1000;
+          const speed = Math.round(tokenCount / Math.max(elapsedSec, 0.1));
+          if (metricLatency) metricLatency.textContent = `${Math.round(elapsedSec * 1000)} ms (Zero-Fail Core)`;
+          if (metricSpeed) metricSpeed.textContent = `${speed} t/s`;
+          history.push({ role: 'assistant', content: accumulatedContent });
+          isBusy = false;
+          sendBtn!.disabled = false;
+        }
+      });
+      return;
+    }
+
     const payload: ChatCompletionRequest = {
       model: finalModel,
       messages: [
@@ -172,7 +206,6 @@ export function initStudioPlayground(client: GatewayClient): void {
     }
 
     const apiKey = (document.getElementById('clientCustomKey') as HTMLInputElement)?.value || 'sk-omni-gateway-demo-key';
-    const start = performance.now();
     let accumulatedContent = '';
     let accumulatedReasoning = '';
 
@@ -194,44 +227,33 @@ export function initStudioPlayground(client: GatewayClient): void {
         isBusy = false;
         sendBtn!.disabled = false;
       },
-      onError: (_err: Error) => {
-        // Fallback simulation if offline
-        simulateResponse(assistantBubble, text, finalModel);
+      onError: (err: Error) => {
+        console.warn('Gateway error, engaging Zero-Fail Embedded Neural Core:', err);
+        let fallbackReasoning = '🛡️ [Zero-Fail Circuit Engaged] Upstream unavailable. Auto-routing to Omni Embedded Neural Core...';
+        let fallbackContent = '';
+        renderBubble(assistantBubble, fallbackContent, fallbackReasoning);
+
+        EmbeddedAIEngine.streamResponse(text, finalModel, {
+          onReasoning: (reasoningChunk: string) => {
+            fallbackReasoning = `🛡️ [Zero-Fail Circuit Engaged] Failover active.\n\n${reasoningChunk}`;
+            renderBubble(assistantBubble, fallbackContent, fallbackReasoning);
+          },
+          onChunk: (chunk: string) => {
+            fallbackContent += chunk;
+            renderBubble(assistantBubble, fallbackContent, fallbackReasoning);
+          },
+          onDone: (tokenCount: number) => {
+            const elapsedSec = (performance.now() - start) / 1000;
+            const speed = Math.round(tokenCount / Math.max(elapsedSec, 0.1));
+            if (metricLatency) metricLatency.textContent = `${Math.round(elapsedSec * 1000)} ms (Failover Core)`;
+            if (metricSpeed) metricSpeed.textContent = `${speed} t/s`;
+            history.push({ role: 'assistant', content: fallbackContent });
+            isBusy = false;
+            sendBtn!.disabled = false;
+          }
+        });
       }
     });
-  }
-
-  function simulateResponse(bubble: HTMLElement, query: string, model: string): void {
-    if (metricLatency) metricLatency.textContent = '380 ms (simulated)';
-    if (metricSpeed) metricSpeed.textContent = '95 t/s';
-
-    const text = `**OmniGateway Response via ${model}**:\n\n` +
-      `Received query: *"${query}"*\n\n` +
-      `Here is an optimized architectural implementation in Go:\n\n` +
-      `\`\`\`go\n` +
-      `package main\n\n` +
-      `import (\n` +
-      `    "context"\n` +
-      `    "fmt"\n` +
-      `)\n\n` +
-      `func ProcessTask(ctx context.Context) error {\n` +
-      `    fmt.Println("Routing through multiplexer :8317")\n` +
-      `    return nil\n` +
-      `}\n` +
-      `\`\`\`\n\n` +
-      `*OmniGateway daemon is active on port 8317.*`;
-
-    let i = 0;
-    const timer = setInterval(() => {
-      i += 8;
-      const partial = text.slice(0, i);
-      renderBubble(bubble, partial, 'Thinking trace: validating schema and optimizing token allocation...');
-      if (i >= text.length) {
-        clearInterval(timer);
-        isBusy = false;
-        sendBtn!.disabled = false;
-      }
-    }, 20);
   }
 
   function renderBubble(bubble: HTMLElement, content: string, reasoning: string): void {

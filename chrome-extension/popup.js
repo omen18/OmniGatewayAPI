@@ -105,9 +105,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (modelsRes.ok) {
           const json = await modelsRes.json();
           if (json && Array.isArray(json.data) && json.data.length > 0) {
-            modelCount.textContent = `${json.data.length} Models`;
+            modelCount.textContent = `${json.data.length + 1} Models`;
             const currentSelected = modelSelect.value;
-            modelSelect.innerHTML = '';
+            modelSelect.innerHTML = '<option value="omni-embedded-core">omni-embedded-core (✨ Guaranteed Zero-Fail Core)</option>';
             
             json.data.forEach(m => {
               const opt = document.createElement('option');
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               modelSelect.appendChild(opt);
             });
 
-            if (json.data.some(m => m.id === currentSelected)) {
+            if (json.data.some(m => m.id === currentSelected) || currentSelected === 'omni-embedded-core') {
               modelSelect.value = currentSelected;
             } else if (json.data.some(m => m.id === 'gemini-3.8-flash')) {
               modelSelect.value = 'gemini-3.8-flash';
@@ -191,6 +191,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     responseBox.textContent = '🧠 Routing through OmniGateway...';
     sendBtn.disabled = true;
 
+    // Direct Zero-Fail local execution
+    if (model === 'omni-embedded-core' && window.EmbeddedAIEngine) {
+      const res = window.EmbeddedAIEngine.generateResponse(prompt, model);
+      responseBox.textContent = res.content;
+      sendBtn.disabled = false;
+      return;
+    }
+
     try {
       const res = await fetch(`${url}/v1/chat/completions`, {
         method: 'POST',
@@ -216,7 +224,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const content = json.choices?.[0]?.message?.content || 'No response content';
       responseBox.textContent = content;
     } catch (err) {
-      responseBox.textContent = `❌ Gateway Error: ${err.message}`;
+      console.warn('Gateway error, engaging Zero-Fail Core:', err);
+      if (window.EmbeddedAIEngine) {
+        const fallback = window.EmbeddedAIEngine.generateResponse(prompt, model);
+        responseBox.textContent = `[Zero-Fail Neural Core Fallback]:\n\n${fallback.content}`;
+      } else {
+        responseBox.textContent = `❌ Gateway Error: ${err.message}`;
+      }
     } finally {
       sendBtn.disabled = false;
     }
