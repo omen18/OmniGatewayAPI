@@ -1,0 +1,9 @@
+{
+  "name": "omni-gateway-api",
+  "version": "7.0.0",
+  "private": true,
+  "description": "Enterprise-grade unified frontier AI proxy server and Retro Neo-Brutalist frontend",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
+  }
+}

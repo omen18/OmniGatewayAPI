@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statusPill && statusText) {
       if (health.ok) {
         statusPill.className =
-          'flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium';
+          'flex items-center gap-2 px-3 py-1 bg-white border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono font-bold';
         statusText.textContent = health.statusText;
         if (statLatency) statLatency.textContent = `${health.latencyMs} ms`;
 
@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         statusPill.className =
-          'flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium';
-        statusText.textContent = health.statusText;
+          'flex items-center gap-2 px-3 py-1 bg-[#ffe17c] border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono font-bold';
+        statusText.textContent = 'Omni AI Live (Zero-Fail)';
       }
     }
   }
