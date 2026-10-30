@@ -8,6 +8,7 @@ import { initStudioPlayground } from './components/studioPlayground';
 import { initQuotaSimulator } from './components/quotaSimulator';
 import { initClientHub } from './components/clientHub';
 import { initConfigBuilder } from './components/configBuilder';
+import { initManagementDock } from './components/managementDock';
 
 declare const lucide: any;
 
@@ -79,4 +80,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initQuotaSimulator();
   initClientHub();
   initConfigBuilder();
+  initManagementDock();
 });

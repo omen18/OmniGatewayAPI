@@ -575,3 +575,37 @@ html.lenis body {
   pointer-events: none;
   opacity: 0.35;
 }
+
+/* ==========================================================================
+   MANAGEMENT SIDE DOCK & EMBEDDED DRAWER
+   ========================================================================== */
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+#managementSideDock {
+  filter: drop-shadow(-3px 3px 0px #000000);
+}
+
+#dockOpenDrawerBtn:hover {
+  background-color: #ffd633;
+}
+
+#managementDrawer {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s ease;
+}
+
+#managementDrawerBackdrop {
+  transition: opacity 0.2s ease;
+}
+
