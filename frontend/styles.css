@@ -1,0 +1,325 @@
+/* OmniGateway Futuristic Cyber-Glass Stylesheet */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap');
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --bg-deep: #05070d;
+  --bg-surface: #0a0e1a;
+  --bg-card: rgba(16, 22, 36, 0.7);
+  --bg-card-hover: rgba(22, 31, 51, 0.85);
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(168, 85, 247, 0.35);
+  --border-cyan: rgba(6, 182, 212, 0.4);
+  
+  --primary-purple: #a855f7;
+  --primary-cyan: #06b6d4;
+  --primary-emerald: #10b981;
+  --primary-rose: #f43f5e;
+  --primary-amber: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  selection-background-color: #a855f7;
+  selection-color: #ffffff;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #080c14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Background Canvas */
+#quantum-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Ambient Radial Glows */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+}
+
+.ambient-purple {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+  top: -150px;
+  left: 10%;
+}
+
+.ambient-cyan {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+  bottom: 10%;
+  right: -100px;
+}
+
+/* Typography Utility */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Gradient Text */
+.text-gradient-cosmic {
+  background: linear-gradient(135deg, #ffffff 10%, #c084fc 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #38bdf8 0%, #22d3ee 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #e879f9 0%, #a855f7 50%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+.glass-card:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(168, 85, 247, 0.15);
+}
+
+/* Interactive Cursor Glow Follower */
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, rgba(6, 182, 212, 0.04) 40%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Cyber Button */
+.btn-cyber {
+  position: relative;
+  background: linear-gradient(135deg, #9333ea 0%, #4f46e5 50%, #0284c7 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.3);
+}
+
+.btn-cyber::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.2) 50%, transparent 55%);
+  transform: rotate(-45deg);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-cyber:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 8px 30px rgba(147, 51, 234, 0.5), 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+.btn-cyber:hover::after {
+  transform: rotate(-45deg) translate(100%, 100%);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: #f1f5f9;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Pulsing Online Dot */
+.pulsing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  position: relative;
+}
+
+.pulsing-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #10b981;
+  animation: pulse-ring 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Packet Flow Animation in SVG Diagram */
+@keyframes packet-dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.packet-flow {
+  stroke-dasharray: 6, 12;
+  animation: packet-dash 1.2s linear infinite;
+}
+
+/* Code Preview Terminal */
+.terminal-window {
+  background: #090d16;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.terminal-header {
+  background: #0e1422;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+/* Custom slider input */
+input[type="range"] {
+  -webkit-appearance: none;
+  background: #1e293b;
+  height: 6px;
+  border-radius: 6px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-cyan));
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  border: 2px solid #ffffff;
+}
+
+/* Chat bubble styling in playground */
+.chat-bubble-user {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  color: #fff;
+  border-radius: 16px 16px 2px 16px;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+}
+
+.chat-bubble-assistant {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px 16px 16px 2px;
+}

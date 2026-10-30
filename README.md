@@ -85,9 +85,11 @@ graph TD
 - **Automated OAuth 2.0 & Token Refresh**:
   - One-click CLI authentication flows with PKCE and headless terminal modes.
   - Background renewal keeps long-running workflows uninterrupted.
-- **Dual Management Interface**:
-  - **Terminal UI (TUI)**: Beautiful full-screen monitoring powered by Charm Bubbletea & Lipgloss (`--tui`).
-  - **Web Management Panel**: Embedded browser dashboard (`/management.html`) for real-time status and credential auditing.
+- **Management & Visual Interfaces**:
+  - **Cyber-Glass Web Dashboard & AI Studio (`/dashboard`)**: High-end GSAP-animated command center with live model playground, interactive account pool quota simulator, visual config generator, and client setup hub.
+  - **Manifest V3 Chrome Extension (`chrome-extension/`)**: Browser copilot & persistent AI side panel with 1-click page summarization, context-menu actions, and real-time gateway HUD.
+  - **Terminal UI (TUI)**: Full-screen terminal dashboard powered by Charm Bubbletea & Lipgloss (`--tui`).
+  - **Web Management Panel**: Embedded control panel (`/management.html`) for configuration and credential management.
 - **Enterprise Storage Options**:
   - File-based default (`~/.cli-proxy-api` / `auths/`)
   - PostgreSQL (`PGSTORE_*`), Redis (`go-redis/v9`), and GitStore (`GITSTORE_*`).
@@ -356,6 +358,41 @@ curl http://localhost:8317/v1/chat/completions \
     ]
   }'
 ```
+
+---
+
+## 🎨 Cyber-Glass Web Dashboard & AI Studio
+
+OmniGateway API features a dedicated, futuristic frontend dashboard with interactive GSAP animations, a live quantum neural particle canvas, a real-time AI playground, and visual configuration builders.
+
+- **URL**: [http://localhost:8317/dashboard](http://localhost:8317/dashboard) (or [http://localhost:8317/](http://localhost:8317/) in any browser)
+- **Standalone Mode**: Can also be launched independently by opening `frontend/index.html`.
+
+### Dashboard Highlights:
+1. **Interactive AI Studio**: Live chat playground with streaming SSE tokens, token-per-second latency counters, and dynamic model switching.
+2. **Extended Reasoning Controller**: Interactive toggle and token budget slider for `:thinking` mode.
+3. **Quota Multiplier Simulator**: Real-time slider to visualize throughput gains and rate-limit immunity as you pool 1 to 15 accounts.
+4. **1-Click Integration Hub**: Dynamic code generator for Claude Code, Cursor, Windsurf, Python SDK, Node.js, and cURL.
+5. **Visual Config Generator**: Interactive form that generates and exports production-ready `config.yaml` files.
+
+---
+
+## 🧩 Chrome Extension (Manifest V3)
+
+Take OmniGateway intelligence into every browser tab with the included Chrome extension (`chrome-extension/`):
+
+- **HUD Popup**: Instant gateway status, latency check, model list, and quick prompts.
+- **Persistent AI Side Panel**: Docked beside your active tab for interactive conversations.
+- **1-Click Page Intelligence**:
+  - 📄 **Summarize Page**: Reads clean page text and distills top insights.
+  - 🔍 **Explain Selection**: Select any text or code snippet to analyze edge cases and logic.
+  - 💡 **Key Takeaways & Code Review**: Fast action templates for developer workflows.
+
+### Installing the Extension:
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked** (top left)
+4. Select the `chrome-extension` directory inside this repository.
 
 ---
 

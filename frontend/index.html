@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniGateway API — Next-Gen AI Proxy & Multiplexer</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              bg: '#05070d',
+              surface: '#0a0e1a',
+              card: '#101624',
+              purple: '#a855f7',
+              cyan: '#06b6d4',
+              emerald: '#10b981',
+              rose: '#f43f5e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- GSAP Animation Suite -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-cyber-bg text-slate-100 selection:bg-purple-600 selection:text-white">
+
+  <!-- Interactive Quantum Canvas Background -->
+  <canvas id="quantum-canvas"></canvas>
+
+  <!-- Ambient Glow Blobs -->
+  <div class="ambient-glow ambient-purple"></div>
+  <div class="ambient-glow ambient-cyan"></div>
+  <div id="cursorGlow" class="cursor-glow"></div>
+
+  <!-- Main Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-cyber-bg/75 border-b border-white/10 transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        
+        <!-- Brand -->
+        <a href="#hero" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-[1px] shadow-lg shadow-purple-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300">
+            <div class="w-full h-full bg-cyber-bg rounded-xl flex items-center justify-center">
+              <i data-lucide="layers" class="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-lg tracking-tight text-white">OmniGateway</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">v7.0</span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-mono tracking-tight">Unified Frontier Proxy</p>
+          </div>
+        </a>
+
+        <!-- Center Nav Links -->
+        <nav class="hidden md:flex items-center gap-1 bg-white/[0.03] border border-white/10 px-3 py-1.5 rounded-full backdrop-blur-md">
+          <a href="#overview" class="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">Overview</a>
+          <a href="#playground" class="px-3.5 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-full transition-all flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            AI Studio
+          </a>
+          <a href="#pool" class="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">Account Pool</a>
+          <a href="#integration" class="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">Client Setup</a>
+          <a href="#config-builder" class="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">Config Builder</a>
+          <a href="#extension" class="px-3.5 py-1.5 text-xs font-medium text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-full transition-all">Chrome Extension</a>
+        </nav>
+
+        <!-- Right Side: Status Badge & Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Gateway Status Pill -->
+          <div id="gatewayStatusPill" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+            <span class="pulsing-dot"></span>
+            <span id="gatewayStatusText">Checking 8317...</span>
+          </div>
+
+          <a href="https://github.com/omen18/OmniGatewayAPI" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all">
+            <i data-lucide="github" class="w-4 h-4"></i>
+            <span>GitHub</span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative pt-20 pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
+      
+      <!-- Magnetic Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/25 mb-8 backdrop-blur-md shadow-lg shadow-purple-500/10 hero-reveal">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i>
+        <span class="text-xs font-semibold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300 uppercase">
+          Autonomous AI Gateway & Multiplexer
+        </span>
+        <span class="w-1 h-1 rounded-full bg-cyan-400"></span>
+        <span class="text-[11px] text-slate-400 font-mono">Go 1.26+ Engine</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="hero-title font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.1] mb-6 hero-reveal">
+        One Universal Gateway for <br>
+        <span class="text-gradient-cosmic">All Frontier AI Models</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-desc text-base sm:text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed mb-10 hero-reveal">
+        Seamlessly route, load-balance, and bidirectional-translate requests between <strong class="text-white font-medium">OpenAI</strong>, <strong class="text-white font-medium">Claude</strong>, <strong class="text-white font-medium">Gemini</strong>, <strong class="text-white font-medium">Grok</strong>, and <strong class="text-white font-medium">Kimi</strong>. Eliminate 429 rate limits, bypass anti-bot TLS fingerprinting, and standardize reasoning.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-16 hero-reveal">
+        <a href="#playground" class="btn-cyber text-sm">
+          <i data-lucide="play" class="w-4 h-4 fill-white"></i>
+          <span>Launch AI Studio Playground</span>
+        </a>
+        <a href="#extension" class="btn-ghost text-sm">
+          <i data-lucide="chrome" class="w-4 h-4 text-cyan-400"></i>
+          <span>Get Chrome Extension</span>
+        </a>
+        <button id="heroCopyConnectBtn" class="btn-ghost text-sm font-mono text-xs">
+          <i data-lucide="terminal" class="w-4 h-4 text-purple-400"></i>
+          <span>curl http://127.0.0.1:8317/v1/models</span>
+        </button>
+      </div>
+
+      <!-- Interactive Animated Traffic Flowchart (GSAP SVG) -->
+      <div class="glass-card p-6 sm:p-8 max-w-5xl mx-auto text-left relative overflow-hidden hero-reveal shadow-2xl border-purple-500/20">
+        
+        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Live Architecture Multiplexer</span>
+          </div>
+          <span class="text-xs font-mono text-cyan-400">Port 8317 &bull; uTLS Cloaking Active</span>
+        </div>
+
+        <!-- SVG Architecture Diagram with animated packet flow -->
+        <svg viewBox="0 0 900 240" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gradPurpleCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a855f7" />
+              <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+            <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#06b6d4" />
+              <stop offset="100%" stop-color="#10b981" />
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Flow Paths -->
+          <path d="M 160 120 L 320 120" stroke="url(#gradPurpleCyan)" stroke-width="3" fill="none" class="packet-flow" />
+          <path d="M 460 120 L 580 120" stroke="url(#gradPurpleCyan)" stroke-width="3" fill="none" class="packet-flow" />
+          <path d="M 700 120 Q 750 60 780 60" stroke="#06b6d4" stroke-width="2" fill="none" class="packet-flow" />
+          <path d="M 700 120 L 780 120" stroke="#a855f7" stroke-width="2" fill="none" class="packet-flow" />
+          <path d="M 700 120 Q 750 180 780 180" stroke="#10b981" stroke-width="2" fill="none" class="packet-flow" />
+
+          <!-- Node 1: Clients -->
+          <g transform="translate(40, 75)">
+            <rect width="130" height="90" rx="12" fill="#0d1322" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="65" y="32" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="middle" font-family="sans-serif">CLIENT LAYER</text>
+            <text x="65" y="52" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">Claude Code</text>
+            <text x="65" y="68" fill="#38bdf8" font-size="10" text-anchor="middle" font-family="monospace">Cursor / SDK</text>
+          </g>
+
+          <!-- Node 2: OmniGateway Core -->
+          <g transform="translate(310, 60)">
+            <rect width="160" height="120" rx="14" fill="#131b2e" stroke="#a855f7" stroke-width="2" filter="url(#glow)"/>
+            <text x="80" y="30" fill="#c084fc" font-size="10" font-weight="800" text-anchor="middle" font-family="sans-serif">CORE GATEWAY</text>
+            <text x="80" y="52" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle" font-family="sans-serif">Gin Multiplexer</text>
+            <text x="80" y="72" fill="#06b6d4" font-size="11" font-weight="600" text-anchor="middle" font-family="monospace">:8317 Engine</text>
+            <text x="80" y="94" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="sans-serif">Round-Robin Pool</text>
+          </g>
+
+          <!-- Node 3: Thinking & Translation -->
+          <g transform="translate(570, 75)">
+            <rect width="140" height="90" rx="12" fill="#0d1322" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+            <text x="70" y="32" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="middle" font-family="sans-serif">TRANSLATION</text>
+            <text x="70" y="52" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">Thinking Engine</text>
+            <text x="70" y="68" fill="#10b981" font-size="10" text-anchor="middle" font-family="monospace">uTLS Spoofing</text>
+          </g>
+
+          <!-- Upstream Nodes -->
+          <g transform="translate(770, 35)">
+            <rect width="110" height="46" rx="8" fill="#090d16" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="55" y="22" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">Google Gemini</text>
+            <text x="55" y="36" fill="#38bdf8" font-size="9" font-family="monospace" text-anchor="middle">3.8 Flash &bull; 2.5 Pro</text>
+          </g>
+
+          <g transform="translate(770, 97)">
+            <rect width="110" height="46" rx="8" fill="#090d16" stroke="#a855f7" stroke-width="1.5"/>
+            <text x="55" y="22" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">Anthropic Claude</text>
+            <text x="55" y="36" fill="#c084fc" font-size="9" font-family="monospace" text-anchor="middle">Claude 3.7 Sonnet</text>
+          </g>
+
+          <g transform="translate(770, 157)">
+            <rect width="110" height="46" rx="8" fill="#090d16" stroke="#10b981" stroke-width="1.5"/>
+            <text x="55" y="22" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">OpenAI GPT</text>
+            <text x="55" y="36" fill="#10b981" font-size="9" font-family="monospace" text-anchor="middle">GPT-5.6 &bull; o3-mini</text>
+          </g>
+        </svg>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/5 text-center">
+          <div>
+            <div class="text-xl sm:text-2xl font-extrabold text-white font-mono" id="statLatency">&lt; 0.8 ms</div>
+            <div class="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Router Overhead</div>
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-extrabold text-cyan-400 font-mono" id="statConnections">10,000+</div>
+            <div class="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Concurrent Goroutines</div>
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-extrabold text-purple-400 font-mono" id="statRateLimits">0% Drop</div>
+            <div class="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Circuit Failover</div>
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-extrabold text-emerald-400 font-mono" id="statMemory">~15 MB</div>
+            <div class="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Memory Baseline</div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Interactive AI Studio / Playground Section -->
+    <section id="playground" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          Interactive <span class="text-gradient-cyan">AI Studio & Playground</span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Directly execute queries through OmniGateway API. Watch streaming tokens, test reasoning parameters, and inspect request traces.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Controls Column (4 cols) -->
+        <div class="lg:col-span-4 space-y-5">
+          <div class="glass-card p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i>
+                Model & Execution
+              </span>
+              <span id="playgroundModelBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Google</span>
+            </div>
+
+            <!-- Model Selection -->
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Upstream Model</label>
+              <select id="studioModelSelect" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-cyan-400 transition-colors">
+                <option value="gemini-3.8-flash">gemini-3.8-flash (Ultra Fast &bull; 1M Context)</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro (Frontier Deep Reasoning)</option>
+                <option value="claude-3-7-sonnet">claude-3-7-sonnet (Hybrid Reasoning)</option>
+                <option value="claude-fable-5">claude-fable-5 (Long-Horizon Agent)</option>
+                <option value="gpt-5.6">gpt-5.6 (OpenAI Baseline)</option>
+                <option value="gpt-4o">gpt-4o (Vision & Multimodal)</option>
+                <option value="grok-4.5">grok-4.5 (xAI Frontier Code)</option>
+                <option value="kimi-k3">kimi-k3 (Moonshot 3T-Class)</option>
+              </select>
+            </div>
+
+            <!-- Thinking Mode Toggle -->
+            <div class="p-3 rounded-xl bg-purple-500/5 border border-purple-500/20">
+              <div class="flex items-center justify-between mb-2">
+                <label for="studioThinkingToggle" class="text-xs font-semibold text-purple-300 flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="brain" class="w-3.5 h-3.5 text-purple-400"></i>
+                  Extended Thinking
+                </label>
+                <input type="checkbox" id="studioThinkingToggle" class="w-4 h-4 accent-purple-500 cursor-pointer">
+              </div>
+              <p class="text-[11px] text-slate-400 leading-normal mb-3">
+                Normalizes thinking parameters across OpenAI, Claude, and Gemini into canonical <code class="text-purple-300">ThinkingConfig</code>.
+              </p>
+              
+              <div id="thinkingBudgetWrapper" class="opacity-50 pointer-events-none transition-opacity">
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Thinking Budget:</span>
+                  <span id="thinkingBudgetValue" class="text-purple-300 font-mono font-bold">4,096 tokens</span>
+                </div>
+                <input type="range" id="thinkingBudgetSlider" min="1024" max="32768" step="1024" value="4096" class="w-full">
+              </div>
+            </div>
+
+            <!-- System Prompt -->
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">System Prompt</label>
+              <textarea id="studioSystemPrompt" rows="3" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-cyan-400 resize-none font-sans" placeholder="You are an expert systems engineer and autonomous coder..."></textarea>
+            </div>
+
+            <!-- Stream Toggle & Temperature -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Temperature: <span id="tempVal" class="text-white font-mono">0.7</span></label>
+                <input type="range" id="studioTempSlider" min="0" max="1" step="0.1" value="0.7" class="w-full">
+              </div>
+              <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.02] border border-white/10">
+                <span class="text-xs text-slate-300 font-medium">SSE Stream</span>
+                <input type="checkbox" id="studioStreamToggle" checked class="w-4 h-4 accent-cyan-400 cursor-pointer">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Gateway Connection Card -->
+          <div class="glass-card p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                <i data-lucide="server" class="w-3.5 h-3.5 text-cyan-400"></i>
+                Gateway Endpoint
+              </span>
+              <button id="studioTestPingBtn" class="text-[11px] text-cyan-400 hover:underline">Ping Now</button>
+            </div>
+            <div class="text-[11px] font-mono bg-black/40 p-2.5 rounded-lg border border-white/5 text-slate-300 truncate">
+              http://127.0.0.1:8317/v1/chat/completions
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat & Results Column (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col glass-card h-[640px]">
+          
+          <!-- Playground Chat Header -->
+          <div class="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-cyber-surface/60">
+            <div class="flex items-center gap-3">
+              <i data-lucide="terminal" class="w-4 h-4 text-cyan-400"></i>
+              <span class="text-xs font-bold text-white font-mono">SESSION STREAM &bull; <span id="activeModelLabel">gemini-3.8-flash</span></span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <div class="hidden sm:flex items-center gap-4 text-[11px] font-mono text-slate-400">
+                <span>Latency: <strong id="metricLatency" class="text-emerald-400">-- ms</strong></span>
+                <span>Speed: <strong id="metricSpeed" class="text-cyan-400">-- t/s</strong></span>
+              </div>
+              <button id="studioClearChatBtn" class="text-xs text-slate-400 hover:text-white p-1 rounded hover:bg-white/5" title="Clear chat history">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div id="studioChatMessages" class="flex-1 overflow-y-auto p-5 space-y-4">
+            
+            <!-- Default Welcome Bubble -->
+            <div class="flex items-start gap-3 max-w-2xl">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="chat-bubble-assistant p-4 text-sm text-slate-200 leading-relaxed shadow-lg">
+                <p class="font-medium text-white mb-1">OmniGateway AI Studio is ready.</p>
+                <p class="text-xs text-slate-400 mb-2">
+                  Send a prompt below to execute real-time multi-provider routing through your local proxy. Extended reasoning (<code class="text-purple-300">:thinking</code>) and SSE streaming are supported.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                  <button class="preset-prompt-btn px-2.5 py-1 text-[11px] rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 transition-colors">
+                    Explain Raft consensus in Go
+                  </button>
+                  <button class="preset-prompt-btn px-2.5 py-1 text-[11px] rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-purple-300 transition-colors">
+                    Compare Claude 3.7 vs Gemini 3.8
+                  </button>
+                  <button class="preset-prompt-btn px-2.5 py-1 text-[11px] rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-300 transition-colors">
+                    Write high-concurrency worker pool
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Playground Input Bar -->
+          <div class="p-4 border-t border-white/10 bg-cyber-surface/90">
+            <div class="flex items-end gap-3 bg-slate-900/90 border border-white/10 focus-within:border-cyan-400 rounded-2xl p-2 transition-all">
+              <textarea id="studioPromptInput" rows="2" class="w-full bg-transparent border-0 text-sm text-white placeholder-slate-500 focus:ring-0 resize-none px-3 py-1 outline-none font-sans" placeholder="Ask OmniGateway anything... (Shift+Enter for new line)"></textarea>
+              <button id="studioSendBtn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 transition-all flex-shrink-0 disabled:opacity-50">
+                <i data-lucide="send" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Multi-Account Pool & Quota Multiplier Simulator Section -->
+    <section id="pool" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <div class="lg:col-span-5 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Load Balancing & Circuit Breaker</span>
+          </div>
+          
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight">
+            Multiply Quotas. <br>
+            <span class="text-gradient-purple">Never Hit HTTP 429 Again.</span>
+          </h2>
+
+          <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+            Single API accounts hit rate limits rapidly during autonomous agent cycles (e.g. Claude Code or multi-agent loops). OmniGateway pools multiple OAuth tokens and API keys, scheduling them via round-robin with exponential cooldown circuit breaking.
+          </p>
+
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span><strong>Instant Failover</strong>: Automatically switches on 429 or 5xx errors</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span><strong>Background Token Refresh</strong>: Keeps OAuth accounts active automatically</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+              <span><strong>Zero-Downtime Hot Reload</strong>: Add accounts without restarting the server</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Interactive Calculator Card -->
+        <div class="lg:col-span-7 glass-card p-6 sm:p-8 space-y-6 border-purple-500/20">
+          <div class="flex items-center justify-between pb-4 border-b border-white/10">
+            <div>
+              <h3 class="text-lg font-bold text-white">Quota Multiplier Simulator</h3>
+              <p class="text-xs text-slate-400">Estimate throughput gains by pooling accounts</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-mono font-bold">Round-Robin Active</span>
+          </div>
+
+          <!-- Slider -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Number of Pooled Accounts</label>
+              <span id="poolAccountCounter" class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 font-mono">5 Accounts</span>
+            </div>
+            <input type="range" id="poolSlider" min="1" max="15" value="5" class="w-full">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+              <span>1 (Single Key)</span>
+              <span>5 (Standard Team)</span>
+              <span>15 (Enterprise Pool)</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Output Metrics -->
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/10 text-center">
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5">
+              <div id="simRPM" class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono">500 RPM</div>
+              <div class="text-[11px] text-slate-400 mt-1 uppercase font-medium">Effective Requests / Min</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5">
+              <div id="simTPM" class="text-2xl sm:text-3xl font-extrabold text-purple-400 font-mono">5.0 M</div>
+              <div class="text-[11px] text-slate-400 mt-1 uppercase font-medium">Tokens / Min Quota</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5">
+              <div id="simUptime" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">99.99%</div>
+              <div class="text-[11px] text-slate-400 mt-1 uppercase font-medium">429 Immunity</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-200 flex items-center gap-3">
+            <i data-lucide="info" class="w-4 h-4 flex-shrink-0 text-cyan-400"></i>
+            <span>Add accounts anytime via <code class="font-mono text-white bg-black/40 px-1.5 py-0.5 rounded">./omni-gateway -antigravity-login</code> or <code class="font-mono text-white bg-black/40 px-1.5 py-0.5 rounded">-claude-login</code>.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 1-Click Client Integration Hub -->
+    <section id="integration" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          Connect in <span class="text-gradient-cosmic">30 Seconds</span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          OmniGateway is a 100% drop-in proxy for all your favorite AI tools and programming languages.
+        </p>
+      </div>
+
+      <div class="glass-card p-6 sm:p-8 max-w-4xl mx-auto">
+        
+        <!-- Live URL & Key customizers -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-6 mb-6 border-b border-white/10">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Proxy Host URL</label>
+            <input type="text" id="clientCustomUrl" value="http://localhost:8317" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-mono text-cyan-400 outline-none focus:border-cyan-400">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Gateway API Key</label>
+            <input type="text" id="clientCustomKey" value="sk-omni-gateway-demo-key" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-mono text-purple-400 outline-none focus:border-purple-400">
+          </div>
+        </div>
+
+        <!-- Tool Tabs -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button class="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition-all" data-tab="claude">
+            Claude Code CLI
+          </button>
+          <button class="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all" data-tab="cursor">
+            Cursor & Windsurf
+          </button>
+          <button class="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all" data-tab="python">
+            Python OpenAI SDK
+          </button>
+          <button class="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all" data-tab="node">
+            Node.js / TypeScript
+          </button>
+          <button class="client-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all" data-tab="curl">
+            Terminal cURL
+          </button>
+        </div>
+
+        <!-- Code Snippet Display -->
+        <div class="terminal-window relative">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span id="clientSnippetTitle" class="text-xs font-mono text-slate-400">~/.zshrc setup</span>
+            <button id="copySnippetBtn" class="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copyBtnText">Copy</span>
+            </button>
+          </div>
+          <pre class="p-5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code id="clientSnippetCode">export ANTHROPIC_BASE_URL="http://localhost:8317"
+export ANTHROPIC_API_KEY="sk-omni-gateway-demo-key"
+
+claude</code></pre>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Visual Config Generator Section -->
+    <section id="config-builder" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          Visual <span class="text-gradient-purple">Config.yaml Generator</span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Configure proxy settings visually and export production-ready YAML instantly.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Form Controls (6 cols) -->
+        <div class="lg:col-span-6 glass-card p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Host Interface</label>
+              <input type="text" id="cfgHost" value="127.0.0.1" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Port</label>
+              <input type="number" id="cfgPort" value="8317" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Gateway Client API Key</label>
+            <input type="text" id="cfgApiKey" value="sk-omni-gateway-demo-key" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Google Gemini API Key (Optional)</label>
+            <input type="text" id="cfgGeminiKey" placeholder="AIzaSy... (leave blank if using OAuth)" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">OpenAI API Key (Optional)</label>
+            <input type="text" id="cfgOpenAIKey" placeholder="sk-proj-... (leave blank if using Codex OAuth)" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Anthropic Claude API Key (Optional)</label>
+            <input type="text" id="cfgClaudeKey" placeholder="sk-ant-... (leave blank if using Claude OAuth)" class="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono">
+          </div>
+
+          <div class="flex items-center gap-2 pt-2">
+            <input type="checkbox" id="cfgRemoteMgmt" class="w-4 h-4 accent-purple-500 rounded">
+            <label for="cfgRemoteMgmt" class="text-xs text-slate-300">Enable Web Management Panel (<code class="text-purple-400">/management.html</code>)</label>
+          </div>
+        </div>
+
+        <!-- YAML Preview & Actions (6 cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <span class="text-xs font-mono text-slate-300 font-semibold">config.yaml (live preview)</span>
+              <div class="flex items-center gap-2">
+                <button id="downloadYamlBtn" class="flex items-center gap-1 px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Download</span>
+                </button>
+                <button id="copyYamlBtn" class="flex items-center gap-1 px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
+            <pre class="p-5 text-xs font-mono text-cyan-300 overflow-x-auto leading-relaxed max-h-[380px]"><code id="yamlPreviewCode">host: "127.0.0.1"
+port: 8317
+
+api-keys:
+  - "sk-omni-gateway-demo-key"
+
+auth-dir: "./auths"</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Chrome Extension Showcase Section -->
+    <section id="extension" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div class="glass-card p-8 sm:p-12 relative overflow-hidden border-cyan-500/30">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold">
+              <i data-lucide="chrome" class="w-3.5 h-3.5"></i>
+              <span>Chrome Extension (Manifest V3)</span>
+            </div>
+
+            <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight">
+              OmniGateway AI <br>
+              <span class="text-gradient-cyan">Directly in Your Browser Sidebar</span>
+            </h2>
+
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Dock frontier intelligence into every website you visit. Summarize lengthy documentation, review GitHub code, translate selections, and chat with Gemini 3.8, Claude, and GPT-5 without leaving your tab.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                <div class="font-bold text-white flex items-center gap-2">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-cyan-400"></i>
+                  1-Click Web Summarization
+                </div>
+                <div class="text-slate-400">Extracts clean page text and distills actionable executive summaries.</div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                <div class="font-bold text-white flex items-center gap-2">
+                  <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-purple-400"></i>
+                  Context Menu Actions
+                </div>
+                <div class="text-slate-400">Right-click any selected text to explain, analyze, or rewrite instantly.</div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                <div class="font-bold text-white flex items-center gap-2">
+                  <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  Live Gateway HUD
+                </div>
+                <div class="text-slate-400">Real-time healthchecks, latency counters, and dynamic model lists.</div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                <div class="font-bold text-white flex items-center gap-2">
+                  <i data-lucide="brain" class="w-3.5 h-3.5 text-rose-400"></i>
+                  Thinking Mode Support
+                </div>
+                <div class="text-slate-400">Toggles extended reasoning with collapsible thought blocks.</div>
+              </div>
+            </div>
+
+            <!-- Install Instructions -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-white/10 space-y-2">
+              <div class="text-xs font-bold text-white flex items-center gap-2">
+                <i data-lucide="download" class="w-4 h-4 text-cyan-400"></i>
+                Load Extension in Chrome (3 steps):
+              </div>
+              <ol class="text-xs text-slate-300 list-decimal list-inside space-y-1 font-mono">
+                <li>Navigate to <span class="text-cyan-300">chrome://extensions</span> and toggle <strong>Developer mode</strong></li>
+                <li>Click <strong>Load unpacked</strong> button</li>
+                <li>Select the <code class="text-purple-300 bg-white/5 px-1 py-0.5 rounded">chrome-extension</code> folder from this project</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Mockup Visual -->
+          <div class="lg:col-span-5 flex justify-center">
+            <div class="w-72 sm:w-80 rounded-2xl bg-slate-950 border border-white/20 p-4 shadow-2xl shadow-cyan-500/20 transform hover:scale-105 transition-all duration-500 space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-md bg-gradient-to-tr from-purple-600 to-cyan-400 flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs font-bold text-white">OmniGateway Copilot</span>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">Online</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-white/5 border border-white/5 text-[11px] text-slate-400">
+                gemini-3.8-flash &bull; Streaming Mode
+              </div>
+              <div class="p-3 rounded-lg bg-purple-600/20 border border-purple-500/30 text-xs text-purple-200">
+                "Summarized 1,400 lines of API specs into 3 core endpoints."
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-900 text-[11px] text-slate-500 flex justify-between">
+                <span>Latency: 280ms</span>
+                <span>Speed: 94 t/s</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-white/10 bg-cyber-bg/90 py-10 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div class="flex items-center gap-3">
+          <span class="font-display font-bold text-white">OmniGateway API</span>
+          <span>&bull;</span>
+          <span>Created by <strong>Yash Raj Sharan</strong></span>
+          <span>&bull;</span>
+          <span class="text-purple-400">3rd Year CSE Major Project</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="https://github.com/omen18/OmniGatewayAPI" target="_blank" class="hover:text-white transition-colors">GitHub Repository</a>
+          <a href="#playground" class="hover:text-white transition-colors">AI Studio</a>
+          <a href="#config-builder" class="hover:text-white transition-colors">Config Builder</a>
+          <a href="LICENSE" class="hover:text-white transition-colors">MIT License</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

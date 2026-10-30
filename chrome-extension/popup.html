@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniGateway AI Control HUD</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(20, 27, 45, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent-purple: #a855f7;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      width: 360px;
+      background: var(--bg);
+      color: var(--text-main);
+      overflow-x: hidden;
+      padding: 14px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    }
+
+    .brand-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
+    }
+
+    .brand-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .status-badge.offline {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--accent-rose);
+      border-color: rgba(244, 63, 94, 0.25);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    select, input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 7px 10px;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+    }
+
+    textarea {
+      resize: none;
+      height: 60px;
+      line-height: 1.4;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #0284c7);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6d28d9, #0369a1);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .response-box {
+      display: none;
+      background: rgba(6, 182, 212, 0.05);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      max-height: 140px;
+      overflow-y: auto;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    .settings-panel {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">OmniGateway AI</div>
+      </div>
+    </div>
+    <div id="statusBadge" class="status-badge">
+      <span class="status-dot"></span>
+      <span id="statusText">Checking...</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="field-label">
+      <span>Target Model</span>
+      <span id="modelCount" style="color: var(--accent-cyan); font-weight: 600;">14 Models</span>
+    </div>
+    <select id="modelSelect">
+      <option value="gemini-3.8-flash">gemini-3.8-flash (Frontier Fast)</option>
+      <option value="gemini-2.5-pro">gemini-2.5-pro (Reasoning)</option>
+      <option value="claude-3-7-sonnet">claude-3-7-sonnet (Hybrid)</option>
+      <option value="gpt-5.6">gpt-5.6 (OpenAI Baseline)</option>
+      <option value="gpt-4o">gpt-4o (Multimodal)</option>
+      <option value="grok-4.5">grok-4.5 (xAI Frontier)</option>
+      <option value="kimi-k3">kimi-k3 (Moonshot 1M)</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <div class="field-label">Quick Prompt</div>
+    <textarea id="promptInput" placeholder="Ask OmniGateway anything or test your gateway..."></textarea>
+    <div style="margin-top: 8px; display: flex; gap: 8px;">
+      <button id="sendBtn" class="btn-primary" style="flex: 1;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        Send Query
+      </button>
+      <button id="summarizePageBtn" class="btn-secondary" title="Summarize current browser tab">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Page
+      </button>
+    </div>
+    <div id="responseBox" class="response-box"></div>
+  </div>
+
+  <div class="quick-actions">
+    <button id="openSidepanelBtn" class="btn-primary">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+      Side Panel
+    </button>
+    <button id="openDashboardBtn" class="btn-secondary">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Dashboard
+    </button>
+  </div>
+
+  <div class="toggle-row">
+    <span style="cursor: pointer;" id="toggleSettings">⚙️ Gateway Settings</span>
+    <span id="latencyText" style="font-size: 11px; color: var(--accent-cyan);">-- ms</span>
+  </div>
+
+  <div id="settingsPanel" class="settings-panel card">
+    <div class="field-label">Gateway URL</div>
+    <input type="text" id="gatewayUrlInput" value="http://127.0.0.1:8317">
+    
+    <div class="field-label" style="margin-top: 8px;">Gateway API Key</div>
+    <input type="password" id="apiKeyInput" value="sk-omni-gateway-demo-key">
+
+    <button id="saveSettingsBtn" class="btn-secondary btn-full" style="margin-top: 10px;">
+      Save & Test Connection
+    </button>
+  </div>
+
+  <div class="footer">
+    <span>OmniGateway v7.0</span>
+    <a href="https://github.com/omen18/OmniGatewayAPI" target="_blank">GitHub Repo</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -127,8 +128,23 @@ func (s *Server) setupRoutes() {
 		v1beta.GET("/models/*action", s.geminiGetHandler(geminiHandlers))
 	}
 
+	// Static route for frontend dashboard
+	if _, errStat := os.Stat("frontend"); errStat == nil {
+		s.engine.Static("/dashboard", "frontend")
+	}
+
 	// Root endpoint
-	s.engine.GET("/", func(c *gin.Context) {
+	rootHandler := func(c *gin.Context) {
+		if c.Request.Method == http.MethodHead {
+			c.Status(http.StatusOK)
+			return
+		}
+		if strings.Contains(c.GetHeader("Accept"), "text/html") {
+			if _, err := os.Stat("frontend/index.html"); err == nil {
+				c.File("frontend/index.html")
+				return
+			}
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Omni Gateway API Server",
 			"endpoints": []string{
@@ -137,7 +153,9 @@ func (s *Server) setupRoutes() {
 				"GET /v1/models",
 			},
 		})
-	})
+	}
+	s.engine.GET("/", rootHandler)
+	s.engine.HEAD("/", rootHandler)
 
 	// OAuth callback endpoints (reuse main server port)
 	// These endpoints receive provider redirects and persist
