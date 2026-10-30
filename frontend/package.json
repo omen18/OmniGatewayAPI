@@ -1,0 +1,25 @@
+{
+  "name": "omni-gateway-frontend",
+  "version": "7.0.0",
+  "description": "High-end GSAP-animated Cyber-Glass frontend and studio for OmniGateway API",
+  "scripts": {
+    "build": "tsc --noEmit && esbuild src/main.ts --bundle --minify --sourcemap --outfile=app.js",
+    "dev": "esbuild src/main.ts --bundle --sourcemap --watch --outfile=app.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "omni-gateway",
+    "ai",
+    "proxy",
+    "gsap",
+    "typescript",
+    "frontier-models"
+  ],
+  "author": "Yash Raj Sharan <yashraj10messi@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.0"
+  }
+}
