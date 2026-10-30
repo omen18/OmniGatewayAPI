@@ -48,17 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const modelList = await client.fetchModels(apiKey);
         if (modelList && modelList.data && modelList.data.length > 0 && studioModelSelect) {
           const currentSelected = studioModelSelect.value;
-          studioModelSelect.innerHTML = '';
+          studioModelSelect.innerHTML = `
+            <option value="omni-embedded-core">✨ Omni AI (Friendly Consumer Copilot • Instant Zero-Fail)</option>
+          `;
           modelList.data.forEach((m) => {
             const opt = document.createElement('option');
             opt.value = m.id;
             opt.textContent = `${m.id} (${m.owned_by || 'frontier'})`;
             studioModelSelect.appendChild(opt);
           });
-          if (modelList.data.some((m) => m.id === currentSelected)) {
+          if (currentSelected && (currentSelected === 'omni-embedded-core' || modelList.data.some((m) => m.id === currentSelected))) {
             studioModelSelect.value = currentSelected;
-          } else if (modelList.data.some((m) => m.id === 'gemini-3.8-flash')) {
-            studioModelSelect.value = 'gemini-3.8-flash';
+          } else {
+            studioModelSelect.value = 'omni-embedded-core';
           }
         }
       } else {

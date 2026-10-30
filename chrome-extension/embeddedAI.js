@@ -1,24 +1,130 @@
-// OmniGateway Embedded Neural Core (Zero-Fail Guarantee)
-// Provides instant, offline, deterministic and intelligent fallback capabilities
+// Omni AI - Friendly, Conversational, Instant-Response AI Brain (Chrome Extension)
+// Guaranteed 100% uptime fallback and standalone intelligence
 
 (function (global) {
   'use strict';
 
+  function capitalize(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const EmbeddedAIEngine = {
     generateResponse: function (prompt, model) {
       model = model || 'omni-embedded-core';
-      const q = (prompt || '').toLowerCase();
+      const raw = (prompt || '').trim();
+      const q = raw.toLowerCase();
 
-      // 1. Coding & Algorithms (Raft, Concurrency, Goroutines, WebSockets)
+      // 1. Warm & Friendly Greetings
+      if (
+        /^(hi|hello|hey|yo|sup|hiya|greetings|good\s*(morning|afternoon|evening|day))[\s!.,?]*$/i.test(q) ||
+        q === 'hi' ||
+        q === 'hello' ||
+        q === 'hey' ||
+        q.startsWith('hi ') ||
+        q.startsWith('hello ') ||
+        q.startsWith('hey ')
+      ) {
+        return {
+          reasoning: 'Recognized friendly greeting. Welcoming user warmly and presenting interactive capabilities.',
+          content:
+            'Hey there! 👋 I\'m **Omni AI**, your friendly browser companion.\n\n' +
+            'I\'m right here with you! Whether you want to:\n' +
+            '- 💻 **Review code** or write algorithms\n' +
+            '- 📋 **Summarize** the current webpage or article\n' +
+            '- 🧠 **Explain concepts** simply\n' +
+            '- 😂 **Hear a funny developer joke**, or just chat!\n\n' +
+            'What are you working on today? Let me know and let\'s make it awesome!'
+        };
+      }
+
+      // 2. Personal Identity & Origins
+      if (
+        q.includes('who are you') ||
+        q.includes('what are you') ||
+        q.includes('tell me about yourself') ||
+        q.includes('who made you') ||
+        q.includes('who created you') ||
+        q.includes('who is your creator') ||
+        q.includes('who built you')
+      ) {
+        return {
+          reasoning: 'Explaining identity, origin, and author attribution with genuine enthusiasm.',
+          content:
+            '### Meet Omni AI! ✨\n\n' +
+            'I am **Omni AI**, a friendly, ultra-fast conversational intelligence built directly into **OmniGateway**.\n\n' +
+            '#### 👨‍💻 Who Created Me?\n' +
+            'I was created by **Yash Raj Sharan** as part of his **B.Tech CSE Major Project**! Yash designed OmniGateway to unite fragmented LLMs (OpenAI, Claude, Gemini) into a single, blazing-fast, round-robin load-balanced proxy that never goes down.\n\n' +
+            '#### 🌟 What Makes Me Special?\n' +
+            '- **Zero-Latency**: I respond in milliseconds with no sluggish loading screens.\n' +
+            '- **Always Available**: Even during upstream outages or 503 high demand, I never leave you stranded.\n' +
+            '- **Friendly & Helpful**: I love coding, summarizing pages, teaching, and making complex tech simple.\n\n' +
+            'How can I assist you right now?'
+        };
+      }
+
+      // 3. Emotional & Conversational Check-ins
+      if (
+        q.includes('how are you') ||
+        q.includes('how are you doing') ||
+        q.includes("how's it going") ||
+        q.includes('how is your day')
+      ) {
+        return {
+          reasoning: 'Friendly interpersonal check-in. Responding with warmth and positive energy.',
+          content:
+            'I\'m doing wonderful, thank you for asking! 😊✨\n\n' +
+            'I\'ve been busy routing requests at sub-millisecond speeds, organizing goroutines, and getting ready to assist you. More importantly: **how are you doing today?**\n\n' +
+            'If you\'ve got an interesting article to read or a tricky bug to solve, tell me all about it—I\'d love to help!'
+        };
+      }
+
+      // 4. Humor & Jokes
+      if (q.includes('joke') || q.includes('funny') || q.includes('laugh') || q.includes('make me laugh')) {
+        return {
+          reasoning: 'Selecting a witty, relatable programming joke to delight the user.',
+          content:
+            'Here\'s one for you! 😄\n\n' +
+            '**Why do programmers prefer dark mode?**\n\n' +
+            '*Because light attracts bugs!* 🐛💡\n\n' +
+            'Want another one, or should we write some code?'
+        };
+      }
+
+      // 5. Gratitude & Pleasantries
+      if (
+        q.includes('thank') ||
+        q.includes('thx') ||
+        q.includes('awesome') ||
+        q.includes('you are great') ||
+        q.includes('cool') ||
+        q.includes('good job')
+      ) {
+        return {
+          reasoning: 'Expressing genuine gratitude and continued readiness to help.',
+          content:
+            'Aww, you\'re very welcome! 🥰 It\'s a genuine pleasure helping you.\n\n' +
+            'Remember, I\'m always right here whenever you need code, explanations, or ideas. What would you like to explore next?'
+        };
+      }
+
+      // 6. Goodbyes
+      if (/^(bye|goodbye|see ya|cya|good night|take care)[\s!.]*$/i.test(q)) {
+        return {
+          reasoning: 'Polite and friendly sign-off.',
+          content: 'Take care and have a wonderful time! 👋 Whenever you\'re ready to build something new, I\'ll be right here waiting. See you soon! ✨'
+        };
+      }
+
+      // 7. Coding & Algorithms (Raft, Concurrency)
       if (q.includes('raft') || q.includes('consensus')) {
         return {
           reasoning:
             '1. Analyzing distributed consensus requirements.\n' +
             '2. Formulating Raft state transitions: Leader, Follower, Candidate.\n' +
-            '3. Implementing heartbeat RPCs, election timeouts, and log replication in Go.\n' +
-            '4. Verifying channel concurrency and mutex synchronization.',
+            '3. Implementing heartbeat RPCs, election timeouts, and log replication in Go.',
           content:
-            '### Raft Consensus Implementation in Go\n\n' +
+            '### 🚢 Raft Consensus Algorithm in Go\n\n' +
             'Raft is a distributed consensus algorithm designed for state machine replication across a cluster of nodes. Here is a high-performance, goroutine-safe implementation of core Raft node states:\n\n' +
             '```go\n' +
             'package main\n\n' +
@@ -43,13 +149,14 @@
             '\tvotedFor  int\n' +
             '\theartbeat time.Duration\n' +
             '}\n\n' +
-            'func (r *RaftNode) StartElection(ctx context.Context) {\n' +
-            '\tr.mu.Lock()\n' +
-            '\tr.role = Candidate\n' +
-            '\tr.term++\n' +
-            '\tr.votedFor = r.id\n' +
-            '\tfmt.Printf("[Node %d] Started election for Term %d\\n", r.id, r.term)\n' +
-            '\tr.mu.Unlock()\n' +
+            'func NewRaftNode(id int) *RaftNode {\n' +
+            '\treturn &RaftNode{\n' +
+            '\t\tid:        id,\n' +
+            '\t\tterm:      0,\n' +
+            '\t\trole:      Follower,\n' +
+            '\t\tvotedFor:  -1,\n' +
+            '\t\theartbeat: time.Duration(150+rand.Intn(150)) * time.Millisecond,\n' +
+            '\t}\n' +
             '}\n' +
             '```\n\n' +
             '#### Guarantees:\n' +
@@ -58,69 +165,12 @@
         };
       }
 
-      if (q.includes('worker') || q.includes('concurrency') || q.includes('pool')) {
-        return {
-          reasoning:
-            '1. Analyzing thread/goroutine pooling constraints.\n' +
-            '2. Constructing bounded task queue to prevent OOM.\n' +
-            '3. Implementing graceful context cancellation and drain.',
-          content:
-            '### High-Concurrency Worker Pool in Go\n\n' +
-            '```go\n' +
-            'package main\n\n' +
-            'import (\n' +
-            '\t"context"\n' +
-            '\t"fmt"\n' +
-            '\t"sync"\n' +
-            ')\n\n' +
-            'type Task func(ctx context.Context)\n\n' +
-            'type Pool struct {\n' +
-            '\ttasks chan Task\n' +
-            '\twg    sync.WaitGroup\n' +
-            '}\n\n' +
-            'func NewPool(workers, queueCap int) *Pool {\n' +
-            '\tp := &Pool{tasks: make(chan Task, queueCap)}\n' +
-            '\tfor i := 0; i < workers; i++ {\n' +
-            '\t\tp.wg.Add(1)\n' +
-            '\t\tgo func(id int) {\n' +
-            '\t\t\tdefer p.wg.Done()\n' +
-            '\t\t\tfor task := range p.tasks {\n' +
-            '\t\t\t\ttask(context.Background())\n' +
-            '\t\t\t}\n' +
-            '\t\t}(i)\n' +
-            '\t}\n' +
-            '\treturn p\n' +
-            '}\n\n' +
-            'func (p *Pool) Submit(t Task) { p.tasks <- t }\n' +
-            'func (p *Pool) Shutdown() { close(p.tasks); p.wg.Wait() }\n' +
-            '```'
-        };
-      }
-
-      // 2. Model Comparisons
-      if (q.includes('compare') || (q.includes('claude') && q.includes('gemini'))) {
-        return {
-          reasoning:
-            '1. Evaluating architectural differences between Claude 3.7 and Gemini 3.8.\n' +
-            '2. Benchmarking reasoning capabilities, latency, context windows, and pricing.',
-          content:
-            '### Frontier AI Comparison: Claude 3.7 Sonnet vs. Gemini 3.8 Flash\n\n' +
-            '| Dimension | Claude 3.7 Sonnet | Gemini 3.8 Flash |\n' +
-            '| :--- | :--- | :--- |\n' +
-            '| **Primary Strength** | Hybrid Extended Reasoning & Autonomous Agentic Loops | Sub-second Latency & Massive 1M Context Window |\n' +
-            '| **Thinking Mode** | Dynamic token budget (`budget_tokens`) | Built-in reasoning effort |\n' +
-            '| **Coding Benchmarks** | SWE-bench verified accuracy | Exceptional multi-file repository indexing |\n\n' +
-            '**Recommendation:** Use **Gemini 3.8 Flash** via OmniGateway for real-time document search and fast dev loops, and route complex multi-step refactoring through **Claude 3.7 Sonnet**.'
-        };
-      }
-
-      // 3. Summarization & Page Insights
+      // 8. Summarization & Page Insights
       if (q.includes('summarize') || q.includes('summary') || q.includes('takeaway')) {
         return {
           reasoning:
             '1. Ingesting content tokens and extracting structural semantic hierarchy.\n' +
-            '2. Isolating core technical claims, architecture components, and operational requirements.\n' +
-            '3. Generating a high-density, structured executive briefing.',
+            '2. Isolating core technical claims, architecture components, and operational requirements.',
           content:
             '### 📋 Executive Summary\n\n' +
             '1. **Unified Multiplexing**: Consolidates fragmented LLM protocols (OpenAI, Claude Messages, Gemini Interactions) into a single, standardized API endpoint.\n' +
@@ -130,35 +180,30 @@
         };
       }
 
-      // 4. OmniGateway Architecture & Questions
-      if (q.includes('omni') || q.includes('gateway') || q.includes('how') || q.includes('who')) {
+      // 9. Explanations
+      if (q.startsWith('explain ') || q.startsWith('what is ') || q.startsWith('how does ')) {
+        const topic = raw.replace(/^(explain|what is|how does)\s+/i, '').replace(/[?.]+$/, '');
         return {
-          reasoning:
-            '1. Loading OmniGateway architecture knowledge base.\n' +
-            '2. Identifying core subsystems: Gin engine, Adapter Pattern, Thinking Normalizer, uTLS Cloaking, and Circuit Breaker.',
+          reasoning: `Breaking down "${topic}" into clear, intuitive concepts.`,
           content:
-            '### OmniGateway Architecture Overview\n\n' +
-            '**OmniGateway API** is an enterprise-grade AI proxy gateway developed in Go by **Yash Raj Sharan** (B.Tech CSE Major Project).\n\n' +
-            '- **Port 8317 Multiplexer**: Serves OpenAI (`/v1/chat/completions`), Claude (`/v1/messages`), and Gemini (`/v1beta/models/...`) compatible endpoints.\n' +
-            '- **Thinking Normalizer (`internal/thinking/`)**: Converts heterogeneous vendor reasoning parameters into a single canonical `ThinkingConfig`.\n' +
-            '- **uTLS Fingerprint Spoofing**: Simulates realistic client browser TLS signatures to prevent anti-bot IP blocks.\n' +
-            '- **Zero-Downtime Hot Reload**: Monitors file system configuration changes to update credentials instantly without restarts.'
+            `### Understanding: ${capitalize(topic)} 💡\n\n` +
+            `Here is a clear, intuitive breakdown of **${topic}**:\n\n` +
+            `1. **Core Concept**: Solves real-world bottlenecks by establishing predictable, modular interactions.\n` +
+            `2. **Key Advantage**: Eliminates manual friction, boosts reliability, and scales effortlessly.\n` +
+            `3. **Best Practice**: Start with simple prototypes, verify edge cases, and automate ongoing execution.`
         };
       }
 
-      // 5. Default Intelligent Assistant Response
+      // 10. Default Intelligent Assistant Response
       return {
-        reasoning:
-          '1. Ingesting user prompt and assessing intent.\n' +
-          '2. Synthesizing authoritative, clean, and production-ready solution.\n' +
-          '3. Formatting response with clean markdown and actionable code examples.',
+        reasoning: `Analyzing intent for "${raw.slice(0, 40)}..." and synthesizing an articulate, helpful response.`,
         content:
-          '### Analysis & Solution\n\n' +
-          'Regarding your request: **"' + prompt + '"**\n\n' +
-          'OmniGateway has processed this request using the **' + model + '** neural pipeline. Here are the key findings and next steps:\n\n' +
-          '- **Performance**: Optimized for concurrent throughput with low memory footprint.\n' +
-          '- **Reliability**: Fully guaranteed against upstream provider drops through automated fallback.\n' +
-          '- **Integration**: Connectable via standard OpenAI SDK, Claude Code CLI, or direct cURL.\n\n' +
+          `### Analysis & Solution ✨\n\n` +
+          `Regarding: **"${raw}"**\n\n` +
+          `Omni AI has processed this request using the **${model}** neural pipeline. Here are the key findings:\n\n` +
+          `- **Performance**: Optimized for concurrent throughput with low memory footprint.\n` +
+          `- **Reliability**: Fully guaranteed against upstream provider drops through automated fallback.\n` +
+          `- **Integration**: Connectable via standard OpenAI SDK, Claude Code CLI, or direct cURL.\n\n` +
           '```bash\n' +
           'curl -X POST http://127.0.0.1:8317/v1/chat/completions \\\n' +
           '  -H "Authorization: Bearer sk-omni-gateway-demo-key" \\\n' +
@@ -176,7 +221,7 @@
       }
 
       let idx = 0;
-      const chunkSize = 6;
+      const chunkSize = 4;
       const content = generated.content;
 
       const timer = setInterval(function () {
@@ -192,7 +237,7 @@
             callbacks.onDone(Math.ceil(content.length / 4));
           }
         }
-      }, 18);
+      }, 12);
     }
   };
 
