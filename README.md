@@ -13,7 +13,11 @@
 
 *Seamlessly bridge, load-balance, and translate requests between OpenAI, Anthropic Claude, Google Gemini, xAI Grok, and Moonshot Kimi.*
 
-[English](README.md) • [Project Report](PROJECT_REPORT.md) • [SDK Docs](docs/sdk-usage.md) • [中文 (Chinese)](README_CN.md) • [日本語 (Japanese)](README_JA.md)
+[English](README.md) • [Live Demo](https://omni-gateway-api.vercel.app) • [Project Report](PROJECT_REPORT.md) • [SDK Docs](docs/sdk-usage.md) • [中文 (Chinese)](README_CN.md) • [日本語 (Japanese)](README_JA.md)
+
+<br>
+
+<img src="./assets/screenshots/omnigateway_landing.png" alt="OmniGateway API — Unified Frontier Multiplexer" width="100%" />
 
 </div>
 
@@ -25,6 +29,7 @@
 > **Course / Track**: B.Tech / B.S. in Computer Science & Engineering (3rd Year Major Project)  
 > **Developer & Maintainer**: **Yash Raj Sharan** ([yashraj10messi@gmail.com](mailto:yashraj10messi@gmail.com))  
 > **Repository**: [https://github.com/omen18/OmniGatewayAPI](https://github.com/omen18/OmniGatewayAPI)  
+> **Live Showcase**: [https://omni-gateway-api.vercel.app](https://omni-gateway-api.vercel.app)  
 > **Comprehensive System Report**: See [`PROJECT_REPORT.md`](PROJECT_REPORT.md) for architecture, design patterns, and benchmarking.
 
 ---
@@ -37,6 +42,68 @@ Modern developer workflows rely heavily on frontier LLMs through coding assistan
 - **Authentication Overhead**: Managing OAuth tokens with short lifespans, API keys, and service accounts is cumbersome.
 
 **OmniGateway API** resolves these challenges by providing a single, unified, protocol-agnostic gateway. Connect any client configured for OpenAI, Claude, or Gemini to OmniGateway API, and let the gateway translate requests, rotate accounts in round-robin fashion, refresh OAuth credentials automatically, and spoof client TLS fingerprints.
+
+---
+
+## 📸 Visual Showcase & Interface Gallery
+
+### 1. Web Studio, Architecture & Playground (`/dashboard`)
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">Unified Frontier Multiplexer Overview</h4>
+      <img src="./assets/screenshots/omnigateway_landing.png" alt="OmniGateway Landing Overview" width="100%" />
+      <p align="center"><em>High-speed Go proxy dashboard with real-time router telemetry, sub-millisecond overhead metrics, and daemon status monitor.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <h4 align="center">Interactive Pipeline & Protocol Router</h4>
+      <img src="./assets/screenshots/omnigateway_architecture.png" alt="OmniGateway Architecture Diagram" width="100%" />
+      <p align="center"><em>Visual pipeline mapping Client SDKs → Gin Multiplexer (<code>:8317</code>) → Canonical Thinking Engine & uTLS Spoofing → Frontier Providers.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">AI Studio & Live Model Playground</h4>
+      <img src="./assets/screenshots/omnigateway_studio.png" alt="OmniGateway AI Studio Playground" width="100%" />
+      <p align="center"><em>Interactive chat studio with canonical Extended Thinking token budget sliders, temperature controls, and real-time token/sec telemetry.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <h4 align="center">1-Click Client Setup & Visual Config Builder</h4>
+      <img src="./assets/screenshots/omnigateway_config.png" alt="OmniGateway Client Setup and Config Generator" width="100%" />
+      <p align="center"><em>Instant SDK snippet generator (OpenAI, Claude Code CLI, cURL, Python, Go) and interactive <code>config.yaml</code> synthesizer.</em></p>
+    </td>
+  </tr>
+</table>
+
+### 2. Management Center Console & Browser Copilot (`/management.html` & Chrome MV3)
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">Management Console — Live Traffic & Telemetry</h4>
+      <img src="./assets/screenshots/omnigateway_console_dashboard.png" alt="OmniGateway Console Dashboard" width="100%" />
+      <p align="center"><em>Real-time rolling request throughput, success/failure bucket analytics, active credentials, provider keys, and routed model counts.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <h4 align="center">Multi-Provider API Key & Pool Manager</h4>
+      <img src="./assets/screenshots/omnigateway_providers.png" alt="OmniGateway AI Providers" width="100%" />
+      <p align="center"><em>Centralized credential pool management across Gemini, Kimi, Codex, Muse (Meta), xAI, Claude, Vertex, and OpenAI-compatible providers.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h4 align="center">Admin Management Center Authentication</h4>
+      <img src="./assets/screenshots/omnigateway_management.png" alt="OmniGateway Management Center Login" width="100%" />
+      <p align="center"><em>Secure bcrypt-authenticated Management Center portal (<code>/management.html</code>) with interactive dot-matrix hero display.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <h4 align="center">Manifest V3 Chrome Extension Copilot</h4>
+      <img src="./assets/screenshots/omnigateway_extension.png" alt="OmniGateway Chrome Extension" width="100%" />
+      <p align="center"><em>Docked browser side-panel copilot for 1-click article summarization, active code review, and instant zero-fail AI answers.</em></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
