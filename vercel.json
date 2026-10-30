@@ -4,5 +4,15 @@
   "installCommand": "cd frontend && npm install",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/management.html", "destination": "http://127.0.0.1:8317/management.html", "permanent": false },
+    { "source": "/management", "destination": "http://127.0.0.1:8317/management.html", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+    }
+  ]
 }
