@@ -1054,13 +1054,37 @@
             Mounting secure management runtime at <code class="bg-white px-1 border border-black font-mono">/management.html</code>. Synchronizing live upstream credentials and token accounting.
           </p>
         </div>
+
+        <!-- Hosted Mode Panel: browsers block public pages from embedding localhost, so offer a top-level launch instead -->
+        <div id="hostedManagementPanel" class="absolute inset-0 bg-[#d4d4d4] hidden flex-col items-center justify-center p-6 overflow-y-auto">
+          <div class="w-full max-w-md bg-white border-2 border-black shadow-[6px_6px_0px_#000]">
+            <div class="retro-titlebar">
+              <span>CONNECT_LOCAL_GATEWAY</span>
+            </div>
+            <div class="p-5 space-y-4 text-black">
+              <h4 class="font-display font-black text-xl uppercase">Open your local console</h4>
+              <p class="text-sm leading-relaxed">
+                The Management Console runs inside your own OmniGateway server. Browsers don't allow a public website to embed it, so it opens in its own tab instead.
+              </p>
+              <a id="hostedManagementOpenBtn" href="http://127.0.0.1:8317/management.html?safe-mode=configure" target="_blank" rel="noopener noreferrer" class="btn-brutal bg-black text-white text-sm py-3 px-5 w-full">
+                <i data-lucide="external-link" class="w-4 h-4 text-[#ffe17c]"></i>
+                <span>Open Management Console</span>
+              </a>
+              <div class="space-y-1.5">
+                <p class="text-xs font-mono font-bold uppercase">Server not running? Start it:</p>
+                <pre class="reading-well-dark p-3 text-xs font-mono text-emerald-300 overflow-x-auto">go run ./cmd/server</pre>
+                <p class="text-xs text-black/70">Then click the button above (default address <code class="bg-[#ffe17c] px-1 border border-black font-mono">127.0.0.1:8317</code>).</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Bottom Status Bar -->
       <div class="p-2 bg-[#171e19] text-white border-t-2 border-black flex items-center justify-between text-[11px] font-mono px-3">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-          <span>Local Multiplexer Bridge: <strong class="text-[#ffe17c]">ACTIVE :8317</strong></span>
+          <span id="drawerBridgeStatus">Local Multiplexer Bridge: <strong class="text-[#ffe17c]">ACTIVE :8317</strong></span>
         </div>
         <span class="text-slate-400">Press <kbd class="bg-black px-1.5 py-0.5 border border-white/30 text-white font-mono text-[10px]">Ctrl+M</kbd> or <kbd class="bg-black px-1.5 py-0.5 border border-white/30 text-white font-mono text-[10px]">Esc</kbd></span>
       </div>

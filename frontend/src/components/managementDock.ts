@@ -21,9 +21,16 @@ export function initManagementDock(): void {
 
   if (!drawer || !backdrop) return;
 
-  // Determine gateway root URL (if served from same host, use relative path; else 127.0.0.1:8317)
-  const isSameHost = window.location.port === '8317' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const gatewayBase = isSameHost ? '' : 'http://127.0.0.1:8317';
+  // The console is served by the Go gateway. When this page is served elsewhere (e.g. Vercel),
+  // browsers block embedding localhost from a public page, so we open it in a new tab instead.
+  const LOCAL_GATEWAY = 'http://127.0.0.1:8317';
+  const isLocalHost = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+  const isHosted = !isLocalHost;
+  const gatewayBase = isHosted ? LOCAL_GATEWAY : '';
+
+  const hostedPanel = document.getElementById('hostedManagementPanel');
+  const hostedOpenBtn = document.getElementById('hostedManagementOpenBtn') as HTMLAnchorElement | null;
+  const bridgeStatus = document.getElementById('drawerBridgeStatus');
 
   let currentMode: 'safe' | 'standard' = 'safe';
   let isExpanded = false;
@@ -34,6 +41,22 @@ export function initManagementDock(): void {
     return `${gatewayBase}${path}`;
   }
 
+  // Point every static management link at the reachable console and open it in a new tab when hosted.
+  if (isHosted) {
+    document.querySelectorAll<HTMLAnchorElement>('a[href^="/management.html"]').forEach((a) => {
+      a.href = `${LOCAL_GATEWAY}${a.getAttribute('href')}`;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    });
+    if (loadingOverlay) loadingOverlay.style.display = 'none';
+    if (hostedPanel) {
+      hostedPanel.classList.remove('hidden');
+      hostedPanel.classList.add('flex');
+    }
+    if (iframe) iframe.style.display = 'none';
+    if (bridgeStatus) bridgeStatus.innerHTML = 'Hosted preview &bull; console opens from <strong class="text-[#ffe17c]">127.0.0.1:8317</strong>';
+  }
+
   function updateTargetDisplay(): void {
     const url = getTargetUrl();
     if (targetDisplay) {
@@ -41,6 +64,9 @@ export function initManagementDock(): void {
     }
     if (popoutBtn) {
       popoutBtn.href = url;
+    }
+    if (hostedOpenBtn) {
+      hostedOpenBtn.href = `${LOCAL_GATEWAY}${currentMode === 'safe' ? '/management.html?safe-mode=configure' : '/management.html'}`;
     }
     if (standardBtn && safeModeBtn) {
       if (currentMode === 'standard') {
@@ -54,7 +80,7 @@ export function initManagementDock(): void {
   }
 
   function loadIframe(forceReload = false): void {
-    if (!iframe) return;
+    if (!iframe || isHosted) return;
     const targetUrl = getTargetUrl();
     if (!isLoaded || forceReload || iframe.src !== targetUrl) {
       if (loadingOverlay) loadingOverlay.style.display = 'flex';
