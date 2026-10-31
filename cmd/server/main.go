@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -533,6 +534,18 @@ func main() {
 	}
 	if cfg == nil {
 		cfg = &config.Config{}
+	}
+
+	// Environment variable overrides for cloud deployments (Render, Koyeb, Docker)
+	if envPort := strings.TrimSpace(os.Getenv("PORT")); envPort != "" {
+		if p, errConv := strconv.Atoi(envPort); errConv == nil && p > 0 {
+			cfg.Port = p
+			log.Infof("overriding server port from PORT environment variable: %d", p)
+		}
+	}
+	if os.Getenv("ALLOW_REMOTE") == "true" || os.Getenv("REMOTE_MANAGEMENT") == "true" {
+		cfg.RemoteManagement.AllowRemote = true
+		log.Info("remote management access enabled via ALLOW_REMOTE environment variable")
 	}
 
 	// In cloud deploy mode, check if we have a valid configuration

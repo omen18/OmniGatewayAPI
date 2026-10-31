@@ -46,9 +46,10 @@ RUN mkdir -p /app/auths
 EXPOSE 8317
 
 ENV PORT=8317
+ENV ALLOW_REMOTE=true
 ENV TZ=UTC
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://127.0.0.1:8317/healthz || exit 1
+  CMD curl -f http://127.0.0.1:${PORT:-8317}/healthz || exit 1
 
 CMD ["./omni-gateway", "--local-model"]
