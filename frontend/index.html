@@ -1055,26 +1055,75 @@
           </p>
         </div>
 
-        <!-- Hosted Mode Panel: browsers block public pages from embedding localhost, so offer a top-level launch instead -->
-        <div id="hostedManagementPanel" class="absolute inset-0 bg-[#d4d4d4] hidden flex-col items-center justify-center p-6 overflow-y-auto">
-          <div class="w-full max-w-md bg-white border-2 border-black shadow-[6px_6px_0px_#000]">
+        <!-- Hosted Mode Panel: Connect Cloud Server or Local Gateway -->
+        <div id="hostedManagementPanel" class="absolute inset-0 bg-[#d4d4d4] hidden flex-col items-center justify-start p-6 overflow-y-auto">
+          <div class="w-full max-w-lg bg-white border-2 border-black shadow-[6px_6px_0px_#000] my-auto">
             <div class="retro-titlebar">
-              <span>CONNECT_LOCAL_GATEWAY</span>
-            </div>
-            <div class="p-5 space-y-4 text-black">
-              <h4 class="font-display font-black text-xl uppercase">Open your local console</h4>
-              <p class="text-sm leading-relaxed">
-                The Management Console runs inside your own OmniGateway server. Browsers don't allow a public website to embed it, so it opens in its own tab instead.
-              </p>
-              <a id="hostedManagementOpenBtn" href="http://127.0.0.1:8317/management.html?safe-mode=configure" target="_blank" rel="noopener noreferrer" class="btn-brutal bg-black text-white text-sm py-3 px-5 w-full">
-                <i data-lucide="external-link" class="w-4 h-4 text-[#ffe17c]"></i>
-                <span>Open Management Console</span>
-              </a>
-              <div class="space-y-1.5">
-                <p class="text-xs font-mono font-bold uppercase">Server not running? Start it:</p>
-                <pre class="reading-well-dark p-3 text-xs font-mono text-emerald-300 overflow-x-auto">go run ./cmd/server</pre>
-                <p class="text-xs text-black/70">Then click the button above (default address <code class="bg-[#ffe17c] px-1 border border-black font-mono">127.0.0.1:8317</code>).</p>
+              <div class="flex items-center gap-2">
+                <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#ffe17c]"></i>
+                <span>MANAGEMENT_GATEWAY_ROUTER.SYS</span>
               </div>
+              <span class="text-[10px] font-mono font-bold bg-[#10b981] text-black px-1.5 py-0.5 border border-black">READY</span>
+            </div>
+
+            <div class="p-5 space-y-4 text-black">
+              <div>
+                <h4 class="font-display font-black text-xl uppercase tracking-tight">Access Management Console</h4>
+                <p class="text-xs text-black/80 font-medium leading-relaxed mt-1">
+                  Connect this dashboard to your cloud-deployed OmniGateway server or local instance to manage upstream credentials, logs, and token accounting.
+                </p>
+              </div>
+
+              <!-- Option A: Custom Cloud Server URL (Render, Koyeb, Railway) -->
+              <div class="p-3 bg-[#ffe17c] border-2 border-black shadow-[2px_2px_0px_#000] space-y-2">
+                <label for="customCloudUrlInput" class="block text-xs font-mono font-bold uppercase text-black">
+                  🌐 Connect Live Cloud Server (Render / Koyeb)
+                </label>
+                <div class="flex gap-2">
+                  <input type="url" id="customCloudUrlInput" placeholder="https://your-omni-gateway.onrender.com" class="flex-1 bg-white border-2 border-black px-3 py-1.5 text-xs font-mono outline-none">
+                  <button id="saveCloudUrlBtn" class="btn-brutal bg-black text-white text-xs py-1.5 px-3">
+                    Connect
+                  </button>
+                </div>
+                <p class="text-[11px] text-black/70 font-sans">
+                  Enter your deployed cloud URL to manage your remote instance directly from this dashboard.
+                </p>
+              </div>
+
+              <!-- Option B: 1-Click Free Cloud Deployment -->
+              <div class="p-3 bg-[#b7c6c2] border-2 border-black shadow-[2px_2px_0px_#000] space-y-2">
+                <div class="text-xs font-mono font-bold uppercase text-black">
+                  🚀 Don't have a cloud server yet? Deploy 100% Free:
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <a href="https://render.com/deploy?repo=https://github.com/omen18/OmniGatewayAPI" target="_blank" rel="noopener noreferrer" class="btn-brutal bg-black text-white text-xs py-2 px-3 text-center">
+                    <span>Deploy to Render ↗</span>
+                  </a>
+                  <a href="https://app.koyeb.com/deploy?type=git&repository=github.com/omen18/OmniGatewayAPI&branch=main&name=omnigateway" target="_blank" rel="noopener noreferrer" class="btn-brutal bg-white text-black text-xs py-2 px-3 text-center">
+                    <span>Deploy to Koyeb ↗</span>
+                  </a>
+                </div>
+                <p class="text-[10px] text-black/75 font-mono">
+                  Both platforms offer free tier hosting with automatic HTTPS and zero credit card required!
+                </p>
+              </div>
+
+              <!-- Option C: Local Gateway Fallback -->
+              <div class="p-3 bg-white border-2 border-black shadow-[2px_2px_0px_#000] space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold uppercase text-black">💻 Running Locally?</span>
+                  <span class="text-[10px] font-mono bg-[#d4d4d4] px-1.5 py-0.5 border border-black font-bold">127.0.0.1:8317</span>
+                </div>
+                <a id="hostedManagementOpenBtn" href="http://127.0.0.1:8317/management.html?safe-mode=configure" target="_blank" rel="noopener noreferrer" class="btn-brutal bg-black text-white text-xs py-2 px-4 w-full">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5 text-[#ffe17c]"></i>
+                  <span>Launch Local Management Console</span>
+                </a>
+                <div class="text-[11px] font-mono text-black/70 flex items-center justify-between pt-1">
+                  <span>Start command:</span>
+                  <code class="bg-[#ffe17c] px-1 py-0.5 border border-black font-bold text-black text-[10px]">go run ./cmd/server</code>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1099,6 +1148,6 @@
   </div>
 
   <!-- Bundled TypeScript Application -->
-  <script src="app.js?v=826175e"></script>
+  <script src="app.js?v=render7"></script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+# Render Blueprint for OmniGateway API
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: omnigateway-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: 8317

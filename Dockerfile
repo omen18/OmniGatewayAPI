@@ -1,37 +1,54 @@
-FROM golang:1.26-bookworm AS builder
+# ==============================================================================
+# OmniGateway API - Production Multi-Stage Dockerfile
+# Compatible with Render, Koyeb, Fly.io, Railway, and Kubernetes
+# ==============================================================================
+
+# 1. Builder Stage
+FROM golang:1.24-bookworm AS builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential git && rm -rf /var/lib/apt/lists/*
+# Install build essentials
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential git ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# Cache Go modules
 COPY go.mod go.sum ./
-
 RUN go mod download
 
+# Copy source repository
 COPY . .
 
-ARG VERSION=dev
+ARG VERSION=7.0.0
 ARG COMMIT=none
 ARG BUILD_DATE=unknown
 
-RUN CGO_ENABLED=1 GOOS=linux go build -buildvcs=false -ldflags="-s -w -X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.BuildDate=${BUILD_DATE}'" -o ./omni-gateway ./cmd/server/
+# Compile portable Linux binary without CGO dependencies
+RUN CGO_ENABLED=0 GOOS=linux go build -buildvcs=false \
+    -ldflags="-s -w -X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.BuildDate=${BUILD_DATE}'" \
+    -o ./omni-gateway ./cmd/server/
 
-FROM debian:bookworm
+# 2. Runtime Stage
+FROM debian:bookworm-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends tzdata ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends tzdata ca-certificates curl && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /OmniGatewayAPI
+WORKDIR /app
 
-COPY --from=builder ./app/OmniGatewayAPI /OmniGatewayAPI/OmniGatewayAPI
+# Copy binary and all assets required by runtime (static management + frontend dashboard)
+COPY --from=builder /app/omni-gateway /app/omni-gateway
+COPY --from=builder /app/config.example.yaml /app/config.yaml
+COPY --from=builder /app/static/ /app/static/
+COPY --from=builder /app/frontend/ /app/frontend/
 
-COPY config.example.yaml /OmniGatewayAPI/config.example.yaml
-
-WORKDIR /OmniGatewayAPI
+# Create runtime directories for persistent auths and configs
+RUN mkdir -p /app/auths
 
 EXPOSE 8317
 
-ENV TZ=Asia/Shanghai
+ENV PORT=8317
+ENV TZ=UTC
 
-RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo "${TZ}" > /etc/timezone
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://127.0.0.1:8317/healthz || exit 1
 
-CMD ["./OmniGatewayAPI"]
+CMD ["./omni-gateway", "--local-model"]

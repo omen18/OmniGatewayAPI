@@ -19,14 +19,21 @@ export function initManagementDock(): void {
   const heroManagementDrawerBtn = document.getElementById('heroManagementDrawerBtn');
   const overviewManagementDrawerBtn = document.getElementById('overviewManagementDrawerBtn');
 
+  const customCloudInput = document.getElementById('customCloudUrlInput') as HTMLInputElement | null;
+  const saveCloudUrlBtn = document.getElementById('saveCloudUrlBtn');
+
   if (!drawer || !backdrop) return;
 
-  // The console is served by the Go gateway. When this page is served elsewhere (e.g. Vercel),
-  // browsers block embedding localhost from a public page, so we open it in a new tab instead.
-  const LOCAL_GATEWAY = 'http://127.0.0.1:8317';
+  const DEFAULT_LOCAL = 'http://127.0.0.1:8317';
   const isLocalHost = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
   const isHosted = !isLocalHost;
-  const gatewayBase = isHosted ? LOCAL_GATEWAY : '';
+
+  let savedCloudUrl = localStorage.getItem('omni_gateway_cloud_url') || '';
+  if (customCloudInput && savedCloudUrl) {
+    customCloudInput.value = savedCloudUrl;
+  }
+
+  let gatewayBase = isHosted ? (savedCloudUrl || DEFAULT_LOCAL) : '';
 
   const hostedPanel = document.getElementById('hostedManagementPanel');
   const hostedOpenBtn = document.getElementById('hostedManagementOpenBtn') as HTMLAnchorElement | null;
@@ -41,21 +48,46 @@ export function initManagementDock(): void {
     return `${gatewayBase}${path}`;
   }
 
-  // Point every static management link at the reachable console and open it in a new tab when hosted.
-  if (isHosted) {
-    document.querySelectorAll<HTMLAnchorElement>('a[href^="/management.html"]').forEach((a) => {
-      a.href = `${LOCAL_GATEWAY}${a.getAttribute('href')}`;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-    });
-    if (loadingOverlay) loadingOverlay.style.display = 'none';
-    if (hostedPanel) {
-      hostedPanel.classList.remove('hidden');
-      hostedPanel.classList.add('flex');
+  function applyHostedLinks(): void {
+    if (isHosted) {
+      const activeBase = savedCloudUrl || DEFAULT_LOCAL;
+      document.querySelectorAll<HTMLAnchorElement>('a[href*="/management.html"]').forEach((a) => {
+        const query = a.href.includes('?') ? a.href.substring(a.href.indexOf('?')) : '';
+        a.href = `${activeBase}/management.html${query}`;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      });
+      if (loadingOverlay) loadingOverlay.style.display = 'none';
+      if (hostedPanel) {
+        hostedPanel.classList.remove('hidden');
+        hostedPanel.classList.add('flex');
+      }
+      if (iframe) iframe.style.display = 'none';
+      if (bridgeStatus) {
+        bridgeStatus.innerHTML = savedCloudUrl
+          ? `Cloud Gateway: <strong class="text-[#ffe17c]">${savedCloudUrl}</strong>`
+          : 'Hosted preview &bull; console opens from <strong class="text-[#ffe17c]">127.0.0.1:8317</strong>';
+      }
     }
-    if (iframe) iframe.style.display = 'none';
-    if (bridgeStatus) bridgeStatus.innerHTML = 'Hosted preview &bull; console opens from <strong class="text-[#ffe17c]">127.0.0.1:8317</strong>';
   }
+
+  applyHostedLinks();
+
+  saveCloudUrlBtn?.addEventListener('click', () => {
+    let raw = (customCloudInput?.value || '').trim();
+    if (raw) {
+      if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
+        raw = 'https://' + raw;
+      }
+      raw = raw.replace(/\/+$/, '');
+      localStorage.setItem('omni_gateway_cloud_url', raw);
+      savedCloudUrl = raw;
+      gatewayBase = raw;
+      applyHostedLinks();
+      updateTargetDisplay();
+      window.open(getTargetUrl(), '_blank');
+    }
+  });
 
   function updateTargetDisplay(): void {
     const url = getTargetUrl();
@@ -66,7 +98,7 @@ export function initManagementDock(): void {
       popoutBtn.href = url;
     }
     if (hostedOpenBtn) {
-      hostedOpenBtn.href = `${LOCAL_GATEWAY}${currentMode === 'safe' ? '/management.html?safe-mode=configure' : '/management.html'}`;
+      hostedOpenBtn.href = `${DEFAULT_LOCAL}${currentMode === 'safe' ? '/management.html?safe-mode=configure' : '/management.html'}`;
     }
     if (standardBtn && safeModeBtn) {
       if (currentMode === 'standard') {
